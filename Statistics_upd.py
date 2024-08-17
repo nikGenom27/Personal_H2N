@@ -78,7 +78,18 @@ class Stats:
                 self.vpip_count += 1
 
             """Подсчет pfr"""
-            """добавить"""
+            if "hero_raises" in hand.preflop_tags["Hero_action_tags"]:
+                if "hero_RFI" in hand.preflop_tags["Hero_action_tags"]:
+                    self.pfr_count += 1
+
+                if "hero_3bet" in hand.preflop_tags["Hero_action_tags"]:
+                    self.pfr_count += 1
+
+                if "hero_4bet" in hand.preflop_tags["Hero_action_tags"]:
+                    self.pfr_count += 1
+
+                if "hero_5bet" in hand.preflop_tags["Hero_action_tags"]:
+                    self.pfr_count += 1
 
             """Статистика бордов на которых не было лимпа"""
             if "limped" not in hand.preflop_tags["Hero_action_tags"]:
@@ -158,12 +169,10 @@ class Stats:
                     if "hero_calls_to_4bet" in hand.preflop_tags["Hero_action_tags"] and "hero_3bet" in hand.preflop_tags["Hero_action_tags"]:
                         self.action_to_4bet_opportunities_add(hand)
                         self.call_to_4bet_count_add(hand)
+            else:
+                """В лимпы нужно запихнуть статистику изолейтов, 3бетов против изолейтов, колов 3бетов в изолах"""
+                pass
 
-    """
-    по идее это все, что идет ниже можно переделать так что б это была одна функция
-    (например сделать из нескольких словарей один, и уже все эти словари в него запихнуть), но вот вопрос надо ли?
-    по идее читаемость кода упадет хотя хз, над этим ещё надо подумать
-    """
     def action_to_rfi_opportunities_add(self, hand):
         if hand.hero_position not in self.action_to_RFI_opportunities.keys():
             self.action_to_RFI_opportunities[hand.hero_position] = dict()
@@ -271,6 +280,10 @@ class Stats:
         return 0
 
     def pre_flop_stats_ret_upd(self):
+        vpip = (self.vpip_count / self.data_len) * 100
+
+        pfr = (self.pfr_count / self.data_len)*100
+
         rfi = {i: self.rfi_count[i] / self.rfi_opportunities[i] for i in self.rfi_count.keys()}
 
         _call_to_RFI = {i: {j: self.call_to_RFI_count[i][j] / self.action_to_RFI_opportunities[i][j] for j in
@@ -290,8 +303,8 @@ class Stats:
                              self._5bet_to_4bet_count[i].keys()} for i in self._5bet_to_4bet_count.keys()}
 
         return {
-            "VPIP%": self.VPIP,
-            "PFR%": self.PFR,
+            "VPIP%": vpip,
+            "PFR%": pfr,
             "RFI%": rfi,
             "call_to_RFI": _call_to_RFI,
             "3bet_to_RFI": _3bet_to_RFI,
