@@ -83,7 +83,6 @@ class Stats:
             """Статистика бордов на которых не было лимпа"""
             if "limped" not in hand.preflop_tags["Hero_action_tags"]:
 
-
                 if "hero_raises" in hand.preflop_tags["Hero_action_tags"]:
 
                     if "hero_RFI" in hand.preflop_tags["Hero_action_tags"]:
@@ -264,10 +263,12 @@ class Stats:
 
         self.call_to_4bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
 
-    def villain_pos(self, action_tags, villain_action):
+    @staticmethod
+    def villain_pos(action_tags, villain_action):
         for j in action_tags:
             if j.split("_")[-1] == villain_action and j.split("_")[0] != "hero":
                 return j.split("_")[0]
+        return 0
 
     def pre_flop_stats_ret_upd(self):
         rfi = {i: self.rfi_count[i] / self.rfi_opportunities[i] for i in self.rfi_count.keys()}
