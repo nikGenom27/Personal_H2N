@@ -43,3 +43,20 @@ class HandMatrix:
         else:
             self.hand_matrix[self.cur_cards][matrix_type]["count"] += 1
             self.hand_matrix[self.cur_cards][matrix_type]["value"] += value
+
+    def overall_count_return(self):
+        count_ = dict()
+        percentages_ = dict()
+        value_ = dict()
+        for cards in self.hand_matrix.keys():
+            for type_ in self.hand_matrix[cards].keys():
+                if type_ not in count_.keys():
+                    count_[type_] = int()
+                    percentages_[type_] = float()
+                    value_[type_] = float()
+                count_[type_] += self.hand_matrix[cards][type_]["count"]
+                value_[type_] += self.hand_matrix[cards][type_]["value"]
+        for type_ in percentages_.keys():
+            percentages_[type_] = count_[type_] / sum(count_.values())
+
+        return [count_, percentages_, value_]

@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import Hand_matrix as hm
 
 """
 Для Hero префлопа реализовать:
@@ -18,34 +19,16 @@ class Stats:
         self.hand_lst = hand_lst
         self.data_len = len(self.hand_lst)
 
-        self.VPIP = float()
-        self.RFI = float()
-        self.PFR = float()
-
         self.pfr_count = int()  # переменная отвечающая за кол-во раздач в которых hero играл рейзом на префлопе
-        self.vpip_count = int()  # переменная отвечающая за кол-во раздач в которых hero участвовал
+        self.vpip_count = int()  # переменная отвечающая за кол-во раздач в которых hero участвовал\
 
-        self.rfi_count = dict()  # словарь, который ведет подсчет фактических rfi(разделяя по позициям)
-        self.rfi_opportunities = dict()  # словарь, который ведет подсчет возможностей rfi(разделяя по позициям)
-
-        # Список действий после RFI(call, 3bet)
-        self.action_to_RFI_opportunities = dict()  # переменная отвечающая за кол-во раздач в которых можно было совершить действие после чьего-то RFI
-        self._3bet_to_RFI_count = dict()
-        self.call_to_RFI_count = dict()  # переменная отвечающая за кол-во раздач в которых фактически был сыгран 3-bet
-
-        # Списиок действий после 3bet(call, 4bet)
-        self.action_to_3bet_opportunities = dict()  # переменная отвечающая за кол-во раздач в которых можно было совершить действие после чьего-то 3bet
-        self._4bet_to_3bet_count = dict()
-        self.call_to_3bet_count = dict()  # переменная отвечающая за кол-во раздач в которых фактически был сыгран 3-bet
-
-        # Возможность за 4бетить в холодную(тк рейнджи 4бета в холодную максимально заужены и со всех пощ +- одинаковые можно не дробить)
-        self.opportunities_open_4bet = dict()
-        self.count_open_4bet = dict()
-
-        # Списиок действий после 4bet(call, 4bet)
-        self.action_to_4bet_opportunities = dict()  # переменная отвечающая за кол-во раздач в которых можно было совершить действие после чьего-то 3bet
-        self._5bet_to_4bet_count = dict()
-        self.call_to_4bet_count = dict()  # переменная отвечающая за кол-во раздач в которых фактически был сыгран 3-bet
+        self.preflop_stats = {
+            "rfi": dict(),
+            "against_rfi": dict(),
+            "against_3bet": dict(),
+            "open_4bet": dict(),
+            "against_4bet": dict()
+        }
 
         self.hero_results = list()
 
@@ -72,6 +55,7 @@ class Stats:
     def pre_flop_stats_upd(self):
 
         for hand in self.hand_lst:
+            matrix_type = str()
 
             """Подсчет vpip"""
             if "hero_raises" in hand.preflop_tags["Hero_action_tags"] or "hero_calls" in hand.preflop_tags["Hero_action_tags"]:
@@ -95,182 +79,70 @@ class Stats:
             if "limped" not in hand.preflop_tags["Hero_action_tags"]:
 
                 if "hero_raises" in hand.preflop_tags["Hero_action_tags"]:
-
+                    matrix_type = "raise"
                     if "hero_RFI" in hand.preflop_tags["Hero_action_tags"]:
-                        if hand.hero_position not in self.rfi_count.keys():
-                            self.rfi_count[hand.hero_position] = 0
-                        if hand.hero_position not in self.rfi_opportunities.keys():
-                            self.rfi_opportunities[hand.hero_position] = 0
-
-                        self.rfi_count[hand.hero_position] += 1
-                        self.rfi_opportunities[hand.hero_position] += 1
+                        self.add_to_hand_matrix(hand, matrix_type, "rfi")
 
                     if "hero_3bet" in hand.preflop_tags["Hero_action_tags"]:
-
-                        self.action_to_rfi_opportunities_add(hand)
-                        self._3bet_to_rfi_count_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_rfi", "RFI")
 
                     if "hero_4bet" in hand.preflop_tags["Hero_action_tags"] and "hero_RFI" in hand.preflop_tags["Hero_action_tags"]:
-                        self.action_to_3bet_opportunities_add(hand)
-                        self._4bet_to_3bet_count_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_3bet", "3bet")
 
                     elif "hero_4bet" in hand.preflop_tags["Hero_action_tags"]:
-                        if hand.hero_position not in self.count_open_4bet.keys():
-                            self.count_open_4bet[hand.hero_position] = 0
-                        if hand.hero_position not in self.opportunities_open_4bet.keys():
-                            self.opportunities_open_4bet[hand.hero_position] = 0
-
-                        self.count_open_4bet[hand.hero_position] += 1
-                        self.opportunities_open_4bet[hand.hero_position] += 1
+                        self.add_to_hand_matrix(hand, matrix_type, "open_4bet")
 
                     if "hero_5bet" in hand.preflop_tags["Hero_action_tags"] and "hero_3bet" in hand.preflop_tags["Hero_action_tags"]:
-                        self.action_to_4bet_opportunities_add(hand)
-                        self._5bet_to_4bet_count_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_4bet", "4bet")
 
                 if "hero_folds" in hand.preflop_tags["Hero_action_tags"]:
-
+                    matrix_type = "fold"
                     if "hero_folds_to_No_raise" in hand.preflop_tags["Hero_action_tags"]:
-                        if hand.hero_position not in self.rfi_opportunities.keys():
-                            self.rfi_opportunities[hand.hero_position] = 0
-
-                        self.rfi_opportunities[hand.hero_position] += 1
+                        self.add_to_hand_matrix(hand, matrix_type, "rfi")
 
                     if "hero_folds_to_RFI" in hand.preflop_tags["Hero_action_tags"]:
-                        self.action_to_rfi_opportunities_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_rfi", "RFI")
 
                     if "hero_folds_to_3bet" in hand.preflop_tags["Hero_action_tags"] and "hero_RFI" in hand.preflop_tags["Hero_action_tags"]:
-                        self.action_to_3bet_opportunities_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_3bet", "3bet")
 
                     elif "hero_folds_to_3bet" in hand.preflop_tags["Hero_action_tags"]:
-                        if hand.hero_position not in self.opportunities_open_4bet.keys():
-                            self.opportunities_open_4bet[hand.hero_position] = 0
-
-                        self.opportunities_open_4bet[hand.hero_position] += 1
+                        self.add_to_hand_matrix(hand, matrix_type, "open_4bet")
 
                     if "hero_folds_to_4bet" in hand.preflop_tags["Hero_action_tags"] and "hero_3bet" in hand.preflop_tags["Hero_action_tags"]:
-                        self.action_to_4bet_opportunities_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_4bet", "4bet")
 
                 if "hero_calls" in hand.preflop_tags["Hero_action_tags"]:
-
+                    matrix_type = "call"
                     if "hero_calls_to_RFI" in hand.preflop_tags["Hero_action_tags"]:
-                        self.action_to_rfi_opportunities_add(hand)
-                        self.call_to_rfi_count_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_rfi", "RFI")
 
                     if "hero_calls_to_3bet" in hand.preflop_tags["Hero_action_tags"] and "hero_RFI" in hand.preflop_tags["Hero_action_tags"]:
-                        self.action_to_3bet_opportunities_add(hand)
-                        self.call_to_3bet_count_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_3bet", "3bet")
 
                     elif "hero_calls_to_3bet" in hand.preflop_tags["Hero_action_tags"]:
-                        if hand.hero_position not in self.opportunities_open_4bet.keys():
-                            self.opportunities_open_4bet[hand.hero_position] = 0
-
-                        self.opportunities_open_4bet[hand.hero_position] += 1
+                        self.add_to_hand_matrix(hand, matrix_type, "open_4bet")
 
                     if "hero_calls_to_4bet" in hand.preflop_tags["Hero_action_tags"] and "hero_3bet" in hand.preflop_tags["Hero_action_tags"]:
-                        self.action_to_4bet_opportunities_add(hand)
-                        self.call_to_4bet_count_add(hand)
+                        self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, matrix_type, "against_4bet", "4bet")
             else:
                 """В лимпы нужно запихнуть статистику изолейтов, 3бетов против изолейтов, колов 3бетов в изолах"""
                 pass
 
-    def action_to_rfi_opportunities_add(self, hand):
-        if hand.hero_position not in self.action_to_RFI_opportunities.keys():
-            self.action_to_RFI_opportunities[hand.hero_position] = dict()
+    def add_to_hand_matrix(self, hand, matrix_type, stat_type):
+        if hand.hero_position not in self.preflop_stats[stat_type].keys():
+            self.preflop_stats[stat_type][hand.hero_position] = hm.HandMatrix()
+        self.preflop_stats[stat_type][hand.hero_position].add(hand.hero_cards, matrix_type, hand.hero_results)
 
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "RFI")
+    def add_to_hand_matrix_taking_into_account_opponent_pos(self, hand, matrix_type, stat_type, villain_action):
+        if hand.hero_position not in self.preflop_stats[stat_type].keys():
+            self.preflop_stats[stat_type][hand.hero_position] = dict()
 
-        if f"{hand.hero_position}vs{villain_pos}" not in self.action_to_RFI_opportunities[hand.hero_position].keys():
-            self.action_to_RFI_opportunities[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
+        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], villain_action)
 
-        self.action_to_RFI_opportunities[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
-    
-    def _3bet_to_rfi_count_add(self, hand):
-        if hand.hero_position not in self._3bet_to_RFI_count.keys():
-            self._3bet_to_RFI_count[hand.hero_position] = dict()
-
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "RFI")
-
-        if f"{hand.hero_position}vs{villain_pos}" not in self._3bet_to_RFI_count[hand.hero_position].keys():
-            self._3bet_to_RFI_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
-            
-        self._3bet_to_RFI_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
-        
-    def call_to_rfi_count_add(self, hand):
-        if hand.hero_position not in self.call_to_RFI_count.keys():
-            self.call_to_RFI_count[hand.hero_position] = dict()
-
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "RFI")
-
-        if f"{hand.hero_position}vs{villain_pos}" not in self.call_to_RFI_count[hand.hero_position].keys():
-            self.call_to_RFI_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
-
-        self.call_to_RFI_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
-
-    def action_to_3bet_opportunities_add(self, hand):
-        if hand.hero_position not in self.action_to_3bet_opportunities.keys():
-            self.action_to_3bet_opportunities[hand.hero_position] = dict()
-
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "3bet")
-
-        if f"{hand.hero_position}vs{villain_pos}" not in self.action_to_3bet_opportunities[hand.hero_position].keys():
-            self.action_to_3bet_opportunities[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
-
-        self.action_to_3bet_opportunities[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
-
-    def _4bet_to_3bet_count_add(self, hand):
-        if hand.hero_position not in self._4bet_to_3bet_count.keys():
-            self._4bet_to_3bet_count[hand.hero_position] = dict()
-
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "3bet")
-
-        if f"{hand.hero_position}vs{villain_pos}" not in self._4bet_to_3bet_count[hand.hero_position].keys():
-            self._4bet_to_3bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
-
-        self._4bet_to_3bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
-
-    def call_to_3bet_count_add(self, hand):
-        if hand.hero_position not in self.call_to_3bet_count.keys():
-            self.call_to_3bet_count[hand.hero_position] = dict()
-
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "3bet")
-
-        if f"{hand.hero_position}vs{villain_pos}" not in self.call_to_3bet_count[hand.hero_position].keys():
-            self.call_to_3bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
-
-        self.call_to_3bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
-
-    def action_to_4bet_opportunities_add(self, hand):
-        if hand.hero_position not in self.action_to_4bet_opportunities.keys():
-            self.action_to_4bet_opportunities[hand.hero_position] = dict()
-
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "4bet")
-
-        if f"{hand.hero_position}vs{villain_pos}" not in self.action_to_4bet_opportunities[hand.hero_position].keys():
-            self.action_to_4bet_opportunities[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
-
-        self.action_to_4bet_opportunities[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
-
-    def _5bet_to_4bet_count_add(self, hand):
-        if hand.hero_position not in self._5bet_to_4bet_count.keys():
-            self._5bet_to_4bet_count[hand.hero_position] = dict()
-
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "4bet")
-
-        if f"{hand.hero_position}vs{villain_pos}" not in self._5bet_to_4bet_count[hand.hero_position].keys():
-            self._5bet_to_4bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
-
-        self._5bet_to_4bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
-
-    def call_to_4bet_count_add(self, hand):
-        if hand.hero_position not in self.call_to_4bet_count.keys():
-            self.call_to_4bet_count[hand.hero_position] = dict()
-
-        villain_pos = self.villain_pos(hand.preflop_tags["Hero_action_tags"], "4bet")
-
-        if f"{hand.hero_position}vs{villain_pos}" not in self.call_to_4bet_count[hand.hero_position].keys():
-            self.call_to_4bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = 0
-
-        self.call_to_4bet_count[hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] += 1
+        if f"{hand.hero_position}vs{villain_pos}" not in self.preflop_stats[stat_type][hand.hero_position].keys():
+            self.preflop_stats[stat_type][hand.hero_position][f"{hand.hero_position}vs{villain_pos}"] = hm.HandMatrix()
+        self.preflop_stats[stat_type][hand.hero_position][f"{hand.hero_position}vs{villain_pos}"].add(hand.hero_cards, matrix_type, hand.hero_results)
 
     @staticmethod
     def villain_pos(action_tags, villain_action):
@@ -284,34 +156,10 @@ class Stats:
 
         pfr = (self.pfr_count / self.data_len)*100
 
-        rfi = {i: self.rfi_count[i] / self.rfi_opportunities[i] for i in self.rfi_count.keys()}
-
-        _call_to_RFI = {i: {j: self.call_to_RFI_count[i][j] / self.action_to_RFI_opportunities[i][j] for j in
-                            self.call_to_RFI_count[i].keys()} for i in self.call_to_RFI_count.keys()}
-        _3bet_to_RFI = {i: {j: self._3bet_to_RFI_count[i][j] / self.action_to_RFI_opportunities[i][j] for j in
-                            self._3bet_to_RFI_count[i].keys()} for i in self._3bet_to_RFI_count.keys()}
-        _call_to_3bet = {i: {j: self.call_to_3bet_count[i][j] / self.action_to_3bet_opportunities[i][j] * rfi[i] for j in
-                             self.call_to_3bet_count[i].keys()} for i in self.call_to_3bet_count.keys()}
-
-        avg_3bet = {i: sum(_3bet_to_RFI[i].values())/len(_3bet_to_RFI[i].values()) for i in _3bet_to_RFI.keys()}
-
-        _4bet_to_3bet = {i: {j: self._4bet_to_3bet_count[i][j] / self.action_to_3bet_opportunities[i][j] * rfi[i] for j in
-                             self._4bet_to_3bet_count[i].keys()} for i in self._4bet_to_3bet_count.keys()}
-        _call_to_4bet = {i: {j: self.call_to_4bet_count[i][j] / self.action_to_4bet_opportunities[i][j] * avg_3bet[i] for j in
-                             self.call_to_4bet_count[i].keys()} for i in self.call_to_4bet_count.keys()}
-        _5bet_to_4bet = {i: {j: self._5bet_to_4bet_count[i][j] / self.action_to_4bet_opportunities[i][j] * avg_3bet[i] for j in
-                             self._5bet_to_4bet_count[i].keys()} for i in self._5bet_to_4bet_count.keys()}
-
+        """"VPIP%": vpip,
+        "PFR%": pfr,"""
         return {
-            "VPIP%": vpip,
-            "PFR%": pfr,
-            "RFI%": rfi,
-            "call_to_RFI": _call_to_RFI,
-            "3bet_to_RFI": _3bet_to_RFI,
-            "call_to_3bet": _call_to_3bet,
-            "4bet_to_3bet": _4bet_to_3bet,
-            "call_to_4bet": _call_to_4bet,
-            "5bet_to_4bet": _5bet_to_4bet
+            "preflop_stats": self.preflop_stats
             }
 
 """Встроить в руку префлоп теги, что б иметь возможность их сортировать"""
