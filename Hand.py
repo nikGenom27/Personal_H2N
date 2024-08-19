@@ -340,11 +340,11 @@ class Hand:
                     elif self.preflop_tags["pot_type"] == "No_raise_pot":
                         self.preflop_tags["Hero_action_tags"].append("hero_RFI")
                     elif self.preflop_tags["pot_type"] == "SRP":
-                        self.preflop_tags["Hero_action_tags"].append("hero_3bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_3bet_to_RFI")
                     elif self.preflop_tags["pot_type"] == "3bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_4bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_4bet_to_3bet")
                     elif self.preflop_tags["pot_type"] == "4bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_5bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_5bet_to_4bet")
                 try:
                     self.preflop_tags["pot_type"] = pot_type_tags[pot_type_tags.index(self.preflop_tags["pot_type"]) + 1]
                 except (IndexError, ValueError):
