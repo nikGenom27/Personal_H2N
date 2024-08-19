@@ -36,15 +36,19 @@ stats_upd.pre_flop_stats_upd()
 stats_inf = stats_upd.pre_flop_stats_ret_upd()
 for stat in stats_inf["preflop_stats"]:
     print(stat)
-    for pos in stats_inf["preflop_stats"][stat].keys():
-        if type(stats_inf["preflop_stats"][stat][pos]) is not dict:
-            count, percentages, value = stats_inf["preflop_stats"][stat][pos].overall_count_return()
-            print(pos, percentages, count, value)
-        else:
-            for HeroPos_vs_OppPos in stats_inf["preflop_stats"][stat][pos].keys():
-                count, percentages, value = stats_inf["preflop_stats"][stat][pos][HeroPos_vs_OppPos].overall_count_return()
-                print(HeroPos_vs_OppPos, percentages, count, value)
-    print()
+    if type(stats_inf["preflop_stats"][stat]) is float:
+        print(stats_inf["preflop_stats"][stat])
+        print()
+    else:
+        for pos in stats_inf["preflop_stats"][stat].keys():
+            if type(stats_inf["preflop_stats"][stat][pos]) is not dict:
+                count, percentages, value = stats_inf["preflop_stats"][stat][pos].overall_count_return()
+                print(pos, percentages, count, value)
+            else:
+                for HeroPos_vs_OppPos in stats_inf["preflop_stats"][stat][pos].keys():
+                    count, percentages, value = stats_inf["preflop_stats"][stat][pos][HeroPos_vs_OppPos].overall_count_return()
+                    print(HeroPos_vs_OppPos, percentages, count, value)
+        print()
     '''
     for j in ["UTG", "HJ", "CO", "BTN", "SB", "BB"]:
         for k in stats_inf'''
