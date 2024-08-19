@@ -47,7 +47,7 @@ class Hand:
 
         """Pre-flop"""
         # vars init
-        self.preflop_tags = {"pot_type": "No_raise_pot", "Hero_action_tags": []}
+        self.preflop_tags = {"pot_type": "No_raise_pot", "Hero_action_tags": [], "Position_action_tags": {}}
         self.preflop_pot_size = float()
         self.players_preflop_money_in_pot = dict()
         self.end_of_preflop_players_in = dict()
@@ -333,62 +333,55 @@ class Hand:
             pot_type_tags = ["Limp_pot", "SRP", "3bet", "4bet", "5bet"]
             if player_info[1][0] == "raises":
                 if player_info[0] == "Hero":
-                    if "hero_raises" not in self.preflop_tags["Hero_action_tags"]:
-                        self.preflop_tags["Hero_action_tags"].append("hero_raises")
                     if self.preflop_tags["pot_type"] == "Limp_pot":
-                        self.preflop_tags["Hero_action_tags"].append("hero_isolates")
+                        self.preflop_tags["Hero_action_tags"].append("hero_raises_against_Limp")
                     elif self.preflop_tags["pot_type"] == "No_raise_pot":
-                        self.preflop_tags["Hero_action_tags"].append("hero_RFI")
+                        self.preflop_tags["Hero_action_tags"].append("hero_raises")
                     elif self.preflop_tags["pot_type"] == "SRP":
-                        self.preflop_tags["Hero_action_tags"].append("hero_3bet_to_RFI")
+                        self.preflop_tags["Hero_action_tags"].append("hero_raises_against_RFI")
                     elif self.preflop_tags["pot_type"] == "3bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_4bet_to_3bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_raises_against_3bet")
                     elif self.preflop_tags["pot_type"] == "4bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_5bet_to_4bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_raises_against_4bet")
                 try:
                     self.preflop_tags["pot_type"] = pot_type_tags[pot_type_tags.index(self.preflop_tags["pot_type"]) + 1]
                 except (IndexError, ValueError):
                     if self.preflop_tags["pot_type"] == "No_raise_pot":
                         self.preflop_tags["pot_type"] = "SRP"
                 if self.preflop_tags["pot_type"] == "SRP":
-                    self.preflop_tags["Hero_action_tags"].append(f"{self.positions[player_info[0]]}_RFI")
+                    self.preflop_tags["Position_action_tags"]["RFI"] = self.positions[player_info[0]]
                 else:
-                    self.preflop_tags["Hero_action_tags"].append(f"{self.positions[player_info[0]]}_{self.preflop_tags["pot_type"]}")
+                    self.preflop_tags["Position_action_tags"][self.preflop_tags["pot_type"]] = self.positions[player_info[0]]
             elif player_info[1][0] == "calls":
                 if self.preflop_tags["pot_type"] == "No_raise_pot":
                     self.preflop_tags["pot_type"] = "Limp_pot"
-                    self.preflop_tags["Hero_action_tags"].append("limped")
+                    self.preflop_tags["Position_action_tags"]["Limp"] = self.positions[player_info[0]]
 
                 if player_info[0] == "Hero":
-                    if "hero_calls" not in self.preflop_tags["Hero_action_tags"]:
-                        self.preflop_tags["Hero_action_tags"].append("hero_calls")
                     if self.preflop_tags["pot_type"] == "No_raise_pot" or self.preflop_tags["pot_type"] == "Limp_pot":
-                        self.preflop_tags["Hero_action_tags"].append("hero_limps")
+                        self.preflop_tags["Hero_action_tags"].append("hero_calls")
                     elif self.preflop_tags["pot_type"] == "SRP":
-                        self.preflop_tags["Hero_action_tags"].append("hero_calls_to_RFI")
+                        self.preflop_tags["Hero_action_tags"].append("hero_calls_against_RFI")
                     elif self.preflop_tags["pot_type"] == "3bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_calls_to_3bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_calls_against_3bet")
                     elif self.preflop_tags["pot_type"] == "4bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_calls_to_4bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_calls_against_4bet")
                     elif self.preflop_tags["pot_type"] == "5bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_calls_to_5bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_calls_against_5bet")
             elif player_info[1][0] == "folds":
                 if player_info[0] == "Hero":
-                    if "hero_folds" not in self.preflop_tags["Hero_action_tags"]:
-                        self.preflop_tags["Hero_action_tags"].append("hero_folds")
-
                     if self.preflop_tags["pot_type"] == "Limp_pot":
-                        self.preflop_tags["Hero_action_tags"].append("hero_folds_to_Limp")
+                        self.preflop_tags["Hero_action_tags"].append("hero_folds_against_Limp")
                     elif self.preflop_tags["pot_type"] == "No_raise_pot":
-                        self.preflop_tags["Hero_action_tags"].append("hero_folds_to_No_raise")
+                        self.preflop_tags["Hero_action_tags"].append("hero_folds")
                     elif self.preflop_tags["pot_type"] == "SRP":
-                        self.preflop_tags["Hero_action_tags"].append("hero_folds_to_RFI")
+                        self.preflop_tags["Hero_action_tags"].append("hero_folds_against_RFI")
                     elif self.preflop_tags["pot_type"] == "3bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_folds_to_3bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_folds_against_3bet")
                     elif self.preflop_tags["pot_type"] == "4bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_folds_to_4bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_folds_against_4bet")
                     elif self.preflop_tags["pot_type"] == "5bet":
-                        self.preflop_tags["Hero_action_tags"].append("hero_folds_to_5bet")
+                        self.preflop_tags["Hero_action_tags"].append("hero_folds_against_5bet")
 
     def showdown(self):
         self.info = self.info.split("*** SHOWDOWN ***")[1]
