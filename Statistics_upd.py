@@ -22,7 +22,9 @@ class Stats:
         self.preflop_stats = {
             "PFR": float(),
             "VPIP": float(),
-            "RFI": dict(),
+            "openAction": dict(),
+            "against_Limp": dict(),
+            "against_Isolate": dict(),
             "against_RFI": dict(),
             "against_3bet": dict(),
             "against_3bet_noRaiseYet": dict(),
@@ -60,24 +62,26 @@ class Stats:
                 """Статистика бордов на которых не было лимпа"""
                 if "calls" in hand.preflop_tags["Hero_action_tags"][0] or "raises" in hand.preflop_tags["Hero_action_tags"][0]:
                     self.preflop_stats["VPIP"] += 1
-                if "Limp" not in hand.preflop_tags["Position_action_tags"].keys():
-                    for tag in hand.preflop_tags["Hero_action_tags"]:
-                        tag_ = tag.split("_")
-                        if tag_[1] == "raises":
-                            self.preflop_stats["PFR"] += 1
-                        if "against" not in tag_:
-                            self.add_to_hand_matrix(hand, tag_[1], "RFI")
-                        else:
-                            if tag_[-1] == "3bet" and hand.preflop_tags["Position_action_tags"]["RFI"] != hand.hero_position:
-                                self.add_to_hand_matrix(hand, tag_[1], "against_3bet_noRaiseYet")
-                            elif tag_[-1] == "4bet" and hand.preflop_tags["Position_action_tags"]["4bet"] != hand.preflop_tags["Position_action_tags"]["RFI"]:
-                                self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, tag_[1], "against_4bet_cold", tag_[3])
-                            else:
-                                self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, tag_[1], "_".join([tag_[2], tag_[3]]), tag_[3])
 
-                else:
-                    """В лимпы нужно запихнуть статистику изолейтов, 3бетов против изолейтов, колов 3бетов в изолах"""
-                    pass
+                for tag in hand.preflop_tags["Hero_action_tags"]:
+                    tag_ = tag.split("_")
+                    if tag_[1] == "raises":
+                        self.preflop_stats["PFR"] += 1
+                    if "against" not in tag_:
+                        self.add_to_hand_matrix(hand, tag_[1], "openAction")
+                    elif "Limp" not in hand.preflop_tags["Position_action_tags"].keys():
+                        if tag_[-1] == "3bet" and hand.preflop_tags["Position_action_tags"]["RFI"] != hand.hero_position:
+                            self.add_to_hand_matrix(hand, tag_[1], "against_3bet_noRaiseYet")
+                        elif tag_[-1] == "4bet" and hand.preflop_tags["Position_action_tags"]["4bet"] != hand.preflop_tags["Position_action_tags"]["RFI"]:
+                            self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, tag_[1], "against_4bet_cold", tag_[3])
+                        else:
+                            self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, tag_[1], "_".join([tag_[2], tag_[3]]), tag_[3])
+                    else:
+                        """В лимпы нужно запихнуть статистику изолейтов, 3бетов против изолейтов, колов 3бетов в изолах"""
+                        if "against" not in tag_:
+                            self.add_to_hand_matrix(hand, tag_[1], "Limp")
+                        elif tag_[-1] == "Limp" or tag_[-1] == "Isolate":
+                            self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, tag_[1], "_".join([tag_[2], tag_[3]]), tag_[3])
 
         self.preflop_stats["VPIP"] = (self.preflop_stats["VPIP"] / self.data_len) * 100
 
