@@ -24,6 +24,7 @@ for l in folders:
         for hand in inf:
             if hnd.data_can_be_processed(hand):
                 hand_inf = hnd.Hand(hand)
+                print(hand_inf.seats)
                 hand_inf_lst.append(hand)
                 inf_lst.append(hand_inf)
                 try:

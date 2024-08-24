@@ -36,9 +36,9 @@ class Hand:
 
         # vars init
         self.hero_position = str()
-        self.stack_sizes = dict()
+        self.stack_sizes = dict()  # key: никнейм игрока, value: его размер стека
         self.limit = float()
-        self.seats = dict()
+        self.seats = dict()  # key: номер позиции(циффра), value: никнейм игрока
         self.positions = dict()
         self.players_at_table = int()  # Количество игроков за столом
 
@@ -167,6 +167,9 @@ class Hand:
         else:
             self.twice_showdown()
 
+    """
+    Функция, которая определяет какому месту(номеру) соответвтвует какой игрок за столом
+    """
     def positions_define(self):
         for i in self.position_inf:
             if "Seat" in i:
@@ -176,17 +179,26 @@ class Hand:
         self.players_at_table = len(self.seats)
         self.position_visualisation()
 
+    """
+    Функция, которая распределяет позиции(sb, bb, btn и тд) в зависимости от того какое место за столом занимает btn
+    """
     def position_visualisation(self):
         positions_lst = ['BTN', 'SB', 'BB', 'UTG', 'HJ', 'CO']
         seat_lst = list(self.seats.keys())
         if self.players_at_table == 5:
-            positions_lst = ['BTN', 'SB', 'BB', 'UTG', 'CO']  # данное действие сделано что бы в 5 max у нас перед btn сидел CO, а не HJ
+            positions_lst = ['BTN', 'SB', 'BB', 'UTG', 'CO']  # данное действеи сделаноч что бы в 5 max у нас перед btn сидел CO, а не HJ
+
+        '''
+        Далее цикл дает игрокам позицие такие которые игроки привыкли называть
+        конкретно часть self.players_lst[(i + self.btn_position - 1) % self.players_at_table] дает имя игрока,
+        которое берется из словоря в котороя
+        что б это не вызывало ошибку, а именно делит нацело(если у нас btn на 6 месте то придя по циклу в 7 автоматом 
+        перенесется на 1 место и ему присвоит utg)
+        '''
+
         for i in range(self.players_at_table):
             self.positions[self.players_lst[(i + seat_lst.index(self.btn_position)) % self.players_at_table]] = positions_lst[i]
-            '''Предыдущая строка дает игрокам позицие такие которые покеристы привыкли называть
-            конкретно часть [(i + self.btn_position - 1) % self.players_at_table] дает индекс в списке с игроками так,
-            что б это не вызывало ошибку, а именно делит нацела(если у нас btn на 6 месте то придя по циклу в 7 автоматом 
-            перенесется на 1 место и ему присвоит utg)'''
+
         self.hero_position = self.positions['Hero']
 
     def preflop_act(self):
