@@ -32,14 +32,14 @@ class Hand:
         self.position_inf = [i for i in self.common_inf.split("\n")[2:] if "Seat" in i]
         self.blind_post = [i for i in self.common_inf.split("\n")[2:] if "Seat" not in i]
         self.players_lst = list()
-        self.btn_position = int(self.common_inf.split('\n')[1].split()[4][-1])
+        self.btn_seat = int(self.common_inf.split('\n')[1].split()[4][-1])  # номер места btn за столом
 
         # vars init
-        self.hero_position = str()
+        self.hero_position = str()  # информация о позиции игрока(btn, sb и тд)
         self.stack_sizes = dict()  # key: никнейм игрока, value: его размер стека
-        self.limit = float()
+        self.limit = float()  # Сколько в одном блайнде долларов
         self.seats = dict()  # key: номер позиции(циффра), value: никнейм игрока
-        self.positions = dict()
+        self.positions = dict()  # key: никнейм игрока, value: его позиция
         self.players_at_table = int()  # Количество игроков за столом
 
         self.limit = float(self.common_inf.split("/$")[1].split(")")[0])
@@ -47,15 +47,15 @@ class Hand:
 
         """Pre-flop"""
         # vars init
-        self.preflop_tags = {"pot_type": "No_action", "Hero_action_tags": [], "Position_action_tags": {}}
+        self.preflop_tags = {"pot_type": "No_action", "Hero_action_tags": [], "Position_action_tags": {}}  # список тегов на префлопе
         self.preflop_pot_size = float()
-        self.players_preflop_money_in_pot = dict()
-        self.end_of_preflop_players_in = dict()
-        self.end_of_preflop_stack_sizes = dict()
-        self.preflop_action = list()
-        self.preflop_inf = str()
-        self.preflop_action_inf = list()
-        self.hero_cards = list()
+        self.players_preflop_money_in_pot = dict()  # key: никнейм игрока, value: сколько денег он внес в общий банк на префлопе
+        self.end_of_preflop_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
+        self.end_of_preflop_stack_sizes = dict()  # key: никнейм игрока, value: сколько денег осталось у игрока в стеке к концу префлопа
+        self.preflop_action = list()  # Список действий соверешенных игроками на префлопе
+        self.preflop_inf = str()  # Текст содержащий информацию о префлопе(как он представле в .txt)
+        self.preflop_action_inf = list()  # Текст содержащий информацию о действиях совершенных на префлопе(как он представле в .txt)
+        self.hero_cards = list()  # Информация о картах hero в формате ['Ah', 'Ac'] где первый символ это номинал, а второй масть(2 элемента 2 карты соответственно)
         self.flop_exist = True
         self.turn_exist = True
         self.river_exist = True
@@ -190,14 +190,14 @@ class Hand:
 
         '''
         Далее цикл дает игрокам позицие такие которые игроки привыкли называть
-        конкретно часть self.players_lst[(i + self.btn_position - 1) % self.players_at_table] дает имя игрока,
+        конкретно часть self.players_lst[(i + self.btn_seat - 1) % self.players_at_table] дает имя игрока,
         которое берется из словоря в котороя
         что б это не вызывало ошибку, а именно делит нацело(если у нас btn на 6 месте то придя по циклу в 7 автоматом 
         перенесется на 1 место и ему присвоит utg)
         '''
 
         for i in range(self.players_at_table):
-            self.positions[self.players_lst[(i + seat_lst.index(self.btn_position)) % self.players_at_table]] = positions_lst[i]
+            self.positions[self.players_lst[(i + seat_lst.index(self.btn_seat)) % self.players_at_table]] = positions_lst[i]
 
         self.hero_position = self.positions['Hero']
 
@@ -207,8 +207,8 @@ class Hand:
             self.players_preflop_money_in_pot[i] = float()
 
         poses = sorted(self.seats.keys())
-        sb = poses[(poses.index(self.btn_position) + 1) % self.players_at_table]
-        bb = poses[(poses.index(self.btn_position) + 2) % self.players_at_table]
+        sb = poses[(poses.index(self.btn_seat) + 1) % self.players_at_table]
+        bb = poses[(poses.index(self.btn_seat) + 2) % self.players_at_table]
         # в предыдущих строках делим с остатком что бы избежать ошибок если играем хедзап
 
         for i in self.blind_post:
