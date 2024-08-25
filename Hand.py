@@ -15,6 +15,7 @@ def data_can_be_processed(inf):
 class Hand:
     def __init__(self, hand_info):
 
+
         """
         1st pos - btn
         2nd pos - sb
@@ -29,8 +30,8 @@ class Hand:
         self.common_inf = hand_info.split("*** HOLE CARDS ***")[0]
         self.info = hand_info.split("*** HOLE CARDS ***")[1]
 
-        self.position_inf = [i for i in self.common_inf.split("\n")[2:] if "Seat" in i]
-        self.blind_post = [i for i in self.common_inf.split("\n")[2:] if "Seat" not in i]
+        self.position_inf = [i for i in self.common_inf.split("\n")[2:] if "Seat" in i]  # Список строк с информацией о том какой игрок за каким местом(номером) сидит
+        self.blind_post = [i for i in self.common_inf.split("\n")[2:] if "Seat" not in i]  # Имена игроков которые ставили блайнды и сколько они заплатили
         self.players_lst = list()
         self.btn_seat = int(self.common_inf.split('\n')[1].split()[4][-1])  # номер места btn за столом
 
@@ -70,11 +71,11 @@ class Hand:
         # vars init
         self.flop_pot_size = float()
         self.flop_inf = str()
-        self.flop_action = list()
-        self.end_of_flop_stack_sizes = dict()
-        self.end_of_flop_players_in = dict()
-        self.players_flop_money_in_pot = dict()
-        self.flop_board = list()
+        self.flop_action = list()  # Список действий соверешенных игроками на флопе
+        self.end_of_flop_stack_sizes = dict()  # key: никнейм игрока, value: сколько денег он внес в общий банк на префлопе
+        self.end_of_flop_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
+        self.players_flop_money_in_pot = dict()  # key: никнейм игрока, value: сколько денег осталось у игрока в стеке к концу префлопа
+        self.flop_board = list()  # Карты которые выложили на флопе
         self.flop_action_inf = list()
         # end of vars init
 
@@ -91,10 +92,10 @@ class Hand:
         self.turn_pot_size = float()
         self.turn_inf = str()
         self.turn_action = list()
-        self.end_of_turn_stack_sizes = dict()
-        self.end_of_turn_players_in = dict()
-        self.players_turn_money_in_pot = dict()
-        self.turn_card = str()
+        self.end_of_turn_stack_sizes = dict()  # key: никнейм игрока, value: сколько денег он внес в общий банк на префлопе
+        self.end_of_turn_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
+        self.players_turn_money_in_pot = dict()  # key: никнейм игрока, value: сколько денег осталось у игрока в стеке к концу префлопа
+        self.turn_card = str()  # Карта которую выложили на терне
         self.turn_action_inf = list()
         # end of vars init
 
@@ -111,10 +112,10 @@ class Hand:
         self.river_pot_size = float()
         self.river_inf = str()
         self.river_action = list()
-        self.end_of_river_stack_sizes = dict()
-        self.end_of_river_players_in = dict()
-        self.players_river_money_in_pot = dict()
-        self.river_card = str()
+        self.end_of_river_stack_sizes = dict()  # key: никнейм игрока, value: сколько денег он внес в общий банк на префлопе
+        self.end_of_river_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
+        self.players_river_money_in_pot = dict()  # key: никнейм игрока, value: сколько денег осталось у игрока в стеке к концу префлопа
+        self.river_card = str()  # Карта которую выложили на терне
         self.river_action_inf = list()
         # end of vars init
 
@@ -125,8 +126,7 @@ class Hand:
         if self.river_exist:
             self.river_act()
 
-
-        '''Учет борда когда крутится 2 раза'''
+        '''Второй борд когда выкладываются два ряда карт'''
         self.first_flop = list()
         self.first_turn = str()
         self.first_river = str()
@@ -168,9 +168,18 @@ class Hand:
             self.twice_showdown()
 
     """
-    Функция, которая определяет какому месту(номеру) соответвтвует какой игрок за столом
+    Метод, который определяет какому месту(номеру) соответвтвует какой игрок за столом
     """
     def positions_define(self):
+        """
+        Список используемых переменных
+        self.seats
+        self.stack_sizes
+        self.limit
+        self.players_lst
+        self.players_at_table
+        """
+
         for i in self.position_inf:
             if "Seat" in i:
                 self.seats[int(i.split()[1][0])] = i.split()[2]
@@ -180,37 +189,69 @@ class Hand:
         self.position_visualisation()
 
     """
-    Функция, которая распределяет позиции(sb, bb, btn и тд) в зависимости от того какое место за столом занимает btn
+    Метод, который распределяет позиции(sb, bb, btn и тд) в зависимости от того какое место за столом занимает btn
     """
     def position_visualisation(self):
-        positions_lst = ['BTN', 'SB', 'BB', 'UTG', 'HJ', 'CO']
-        seat_lst = list(self.seats.keys())
+        """
+        Список используемых переменных
+        self.players_at_table
+        self.seats
+        self.positions
+        self.players_lst
+        self.btn_seat
+        self.hero_position
+        self.positions
+        """
+
+        positions_lst = ['BTN', 'SB', 'BB', 'UTG', 'HJ', 'CO']  # Список позиций отсортированый по порядку(начиная с btn)
+        seat_lst = list(self.seats.keys())  # Список номеров мест которые заняты за столом
         if self.players_at_table == 5:
             positions_lst = ['BTN', 'SB', 'BB', 'UTG', 'CO']  # данное действеи сделаноч что бы в 5 max у нас перед btn сидел CO, а не HJ
 
-        '''
+        """
         Далее цикл дает игрокам позицие такие которые игроки привыкли называть
         конкретно часть self.players_lst[(i + self.btn_seat - 1) % self.players_at_table] дает имя игрока,
         которое берется из словоря в котороя
         что б это не вызывало ошибку, а именно делит нацело(если у нас btn на 6 месте то придя по циклу в 7 автоматом 
         перенесется на 1 место и ему присвоит utg)
-        '''
+        """
 
         for i in range(self.players_at_table):
             self.positions[self.players_lst[(i + seat_lst.index(self.btn_seat)) % self.players_at_table]] = positions_lst[i]
 
         self.hero_position = self.positions['Hero']
 
+    """
+    Метод который отвечает за все что происходит на префлопе
+    """
     def preflop_act(self):
 
+        """
+        Список используемых переменных
+        self.blind_post
+        self.stack_sizes
+        self.info
+        self.flop_exist
+        self.turn_exist
+        self.river_exist
+        self.hero_cards
+        self.preflop_inf
+        self.preflop_action_inf
+        self.preflop_action
+        self.preflop_pot_size
+        self.players_preflop_money_in_pot
+        self.end_of_preflop_players_in
+        self.end_of_preflop_stack_sizes
+        """
+
+        """
+        цикл который инициализирует словарь
+        """
         for i in self.seats.values():
             self.players_preflop_money_in_pot[i] = float()
-
-        poses = sorted(self.seats.keys())
-        sb = poses[(poses.index(self.btn_seat) + 1) % self.players_at_table]
-        bb = poses[(poses.index(self.btn_seat) + 2) % self.players_at_table]
-        # в предыдущих строках делим с остатком что бы избежать ошибок если играем хедзап
-
+        """
+        добваление поставленных блайндов в players_preflop_money_in_pot
+        """
         for i in self.blind_post:
             if len(i) != 0:
                 if i.split()[-1] != "all-in":
@@ -219,20 +260,40 @@ class Hand:
                     self.players_preflop_money_in_pot[i.split()[0][:-1]] += np.round(
                         float(i.split()[-4][1:]) / self.limit, 1)
 
+        """
+        подготовительное копирование стек сайзов до начала раздачи, что б далее работать уже с 
+        end_of_preflop_stack_sizes, это нужно для того что б у нас была уже готовая информация какой стек был у игроков
+        на каждом этапе раздаче, включая этап до ее начала.
+        """
         self.end_of_preflop_stack_sizes = self.stack_sizes.copy()
-        self.preflop_inf = self.info.split("*** FLOP *** ")[0]
-        try:
+        self.preflop_inf = self.info.split("*** FLOP *** ")[0]  # отделение префлоп информации от информации о всей раздачи
+
+        """
+        проверка есть ли после префлопа ещё улицы
+        """
+        if len(self.info.split("*** FLOP *** ")) > 1:
             self.info = self.info.split("*** FLOP *** ")[1]
-        except IndexError:
+        else:
             self.flop_exist = False
             self.turn_exist = False
             self.river_exist = False
-        self.preflop_action_inf = self.preflop_inf.split("\n")[self.players_at_table+1:-1]
-        self.hero_cards = self.preflop_inf.split('Dealt to Hero [')[1].split("]")[0].split()
 
+        self.preflop_action_inf = self.preflop_inf.split("\n")[self.players_at_table+1:-1]  # отделение информации о действиях на префлопе
+        self.hero_cards = self.preflop_inf.split('Dealt to Hero [')[1].split("]")[0].split()  # определение карт игрока
+
+
+        """
+        Структуризация действий игроков на префлопе, подсчет денег 
+        внесенных в общий банк на префлопе каждым отдельным игроком
+        и определение оставшихся в раздаче игроков после префлопа
+        """
         self.preflop_action, self.players_preflop_money_in_pot, self.end_of_preflop_players_in = self.action(
             self.preflop_action_inf, self.players_preflop_money_in_pot, self.end_of_preflop_players_in, "pre-flop")
 
+
+        """
+        Подсчет стеков игроков к концу префлопа
+        """
         for i in self.end_of_preflop_stack_sizes.keys():
             self.end_of_preflop_stack_sizes[i] = np.round(self.end_of_preflop_stack_sizes[i] - self.players_preflop_money_in_pot[i], 1)
 

@@ -24,7 +24,7 @@ for l in folders:
         for hand in inf:
             if hnd.data_can_be_processed(hand):
                 hand_inf = hnd.Hand(hand)
-                print(hand_inf.players_preflop_money_in_pot)
+                print(hand_inf.position_inf)
                 hand_inf_lst.append(hand)
                 inf_lst.append(hand_inf)
                 try:
