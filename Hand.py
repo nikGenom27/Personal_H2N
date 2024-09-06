@@ -50,11 +50,11 @@ class Hand:
         # vars init
         self.preflop_tags = {"pot_type": "No_action", "Hero_action_tags": [], "Position_action_tags": {}}  # список тегов на префлопе
         self.preflop_pot_size = float()
-        self.players_preflop_money_in_pot = dict()  # key: никнейм игрока, value: сколько денег он внес в общий банк на префлопе
+        self.players_preflop_money_in_pot = dict()  # key: никнейм игрока, value: сколько блайндов он внес в общий банк на префлопе
         self.end_of_preflop_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
-        self.end_of_preflop_stack_sizes = dict()  # key: никнейм игрока, value: сколько денег осталось у игрока в стеке к концу префлопа
+        self.end_of_preflop_stack_sizes = dict()  # key: никнейм игрока, value: сколько блайндов осталось у игрока в стеке к концу префлопа
         self.preflop_action = list()  # Список действий соверешенных игроками на префлопе
-        self.preflop_inf = str()  # Текст содержащий информацию о префлопе(как он представле в .txt)
+        self.preflop_inf = str()  # Текст содержащий информацию о префлопе(как он представлен в .txt)
         self.preflop_action_inf = list()  # Текст содержащий информацию о действиях совершенных на префлопе(как он представле в .txt)
         self.hero_cards = list()  # Информация о картах hero в формате ['Ah', 'Ac'] где первый символ это номинал, а второй масть(2 элемента 2 карты соответственно)
         self.flop_exist = True
@@ -72,9 +72,9 @@ class Hand:
         self.flop_pot_size = float()
         self.flop_inf = str()
         self.flop_action = list()  # Список действий соверешенных игроками на флопе
-        self.end_of_flop_stack_sizes = dict()  # key: никнейм игрока, value: сколько денег он внес в общий банк на префлопе
+        self.end_of_flop_stack_sizes = dict()  # key: никнейм игрока, value: сколько блайндов он внес в общий банк на префлопе
         self.end_of_flop_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
-        self.players_flop_money_in_pot = dict()  # key: никнейм игрока, value: сколько денег осталось у игрока в стеке к концу префлопа
+        self.players_flop_money_in_pot = dict()  # key: никнейм игрока, value: сколько блайндов осталось у игрока в стеке к концу префлопа
         self.flop_board = list()  # Карты которые выложили на флопе
         self.flop_action_inf = list()
         # end of vars init
@@ -92,9 +92,9 @@ class Hand:
         self.turn_pot_size = float()
         self.turn_inf = str()
         self.turn_action = list()
-        self.end_of_turn_stack_sizes = dict()  # key: никнейм игрока, value: сколько денег он внес в общий банк на префлопе
+        self.end_of_turn_stack_sizes = dict()  # key: никнейм игрока, value: сколько блайндов он внес в общий банк на префлопе
         self.end_of_turn_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
-        self.players_turn_money_in_pot = dict()  # key: никнейм игрока, value: сколько денег осталось у игрока в стеке к концу префлопа
+        self.players_turn_money_in_pot = dict()  # key: никнейм игрока, value: сколько блайндов осталось у игрока в стеке к концу префлопа
         self.turn_card = str()  # Карта которую выложили на терне
         self.turn_action_inf = list()
         # end of vars init
@@ -112,9 +112,9 @@ class Hand:
         self.river_pot_size = float()
         self.river_inf = str()
         self.river_action = list()
-        self.end_of_river_stack_sizes = dict()  # key: никнейм игрока, value: сколько денег он внес в общий банк на префлопе
+        self.end_of_river_stack_sizes = dict()  # key: никнейм игрока, value: сколько блайндов он внес в общий банк на префлопе
         self.end_of_river_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
-        self.players_river_money_in_pot = dict()  # key: никнейм игрока, value: сколько денег осталось у игрока в стеке к концу префлопа
+        self.players_river_money_in_pot = dict()  # key: никнейм игрока, value: сколько блайндов осталось у игрока в стеке к концу префлопа
         self.river_card = str()  # Карта которую выложили на терне
         self.river_action_inf = list()
         # end of vars init
@@ -146,21 +146,15 @@ class Hand:
                 self.second_river = self.info.split("*** SECOND RIVER ***")[1].split("\n")[0][-3:-1]
         """Summary"""
 
-        self.hero_results = float()
+        self.hero_results = float()  # Сколько блайндов в раздаче выиграл/проиграл игрок
         self.hero_wins = False  # T/F в зависимости от того победил hero или нет
-        self.hero_results_1 = float()
-        self.hero_wins_first = False
-        self.hero_results_2 = float()
-        self.hero_wins_second = False
-        self.show_down = str()
-        self.first_show_down = str()
-        self.second_show_down = str()
-        self.sum_info = str()
-        self.winner = dict()
-        self.collected = float()
-        self.collected_right = float()
-        self.rake = float()
-        self.prize = float()
+        self.show_down = str()  # Текст содержащий информацию о шоудауне(как он представлен в .txt)
+        self.first_show_down = str()  # Текст содержащий информацию о первом шоудауне(как он представлен в .txt)
+        self.second_show_down = str()  # Текст содержащий информацию о втором шоудауне(как он представлен в .txt)
+        self.sum_info = str()  # Текст содержащий информацию о summary(как он представлен в .txt)
+        self.winner = dict()  # key: никнейм игрока, value: сколько блайндов он выиграл. Информация о тех кто победил в раздаче(один банк может быть разделен между несколькими участниками раздачи)
+        self.collected = float()  # размер банка в блайндах который делили игроки за вычетом рейка
+        self.rake = float()  # количество денег которое забирает рум в каждой раздаче
 
         if not self.run_it_twice:
             self.showdown()
@@ -245,7 +239,7 @@ class Hand:
         """
 
         """
-        цикл который инициализирует словарь
+        цикл который инициализирует словарь players_preflop_money_in_pot
         """
         for i in self.seats.values():
             self.players_preflop_money_in_pot[i] = float()
@@ -281,15 +275,8 @@ class Hand:
         self.preflop_action_inf = self.preflop_inf.split("\n")[self.players_at_table+1:-1]  # отделение информации о действиях на префлопе
         self.hero_cards = self.preflop_inf.split('Dealt to Hero [')[1].split("]")[0].split()  # определение карт игрока
 
-
-        """
-        Структуризация действий игроков на префлопе, подсчет денег 
-        внесенных в общий банк на префлопе каждым отдельным игроком
-        и определение оставшихся в раздаче игроков после префлопа
-        """
         self.preflop_action, self.players_preflop_money_in_pot, self.end_of_preflop_players_in = self.action(
             self.preflop_action_inf, self.players_preflop_money_in_pot, self.end_of_preflop_players_in, "pre-flop")
-
 
         """
         Подсчет стеков игроков к концу префлопа
@@ -299,36 +286,91 @@ class Hand:
 
         self.preflop_pot_size = sum(self.players_preflop_money_in_pot.values())
 
+    """
+    Метод который отвечает за все что происходит на флопе
+    """
     def flop_act(self):
+        """
+        Список используемых переменных
+        self.flop_inf
+        self.info
+        self.turn_exist
+        self.river_exist
+        self.seats
+        self.flop_board
+        self.players_flop_money_in_pot
+        self.flop_action_inf
+        self.flop_action
+        self.end_of_flop_players_in
+        self.end_of_flop_stack_sizes
+        self.flop_pot_size
+        """
+
+        """Проверка существуют ли еще улицы"""
         self.flop_inf = self.info.split("*** TURN *** ")[0]
-        try:
+        if "*** TURN *** " in self.info:
             self.info = self.info.split("*** TURN *** ")[1]
-        except IndexError:
+        else:
             self.turn_exist = False
             self.river_exist = False
 
+        """
+        цикл который инициализирует словарь players_flop_money_in_pot
+        """
         for i in self.seats.values():
             self.players_flop_money_in_pot[i] = float()
 
+        """
+        Определние того какие карты вышли на флопе
+        """
         self.flop_board = self.flop_inf.split("\n")[0][1:-1].split()
+        """
+        Представление информации о действиях на флопе в виде списка
+        Каждый элемент представляет собой строку в которой написано, какое действие и кем было совершено
+        """
         self.flop_action_inf = self.flop_inf.split("\n")[1:-1]
 
         self.flop_action, self.players_flop_money_in_pot,  self.end_of_flop_players_in = self.action(
             self.flop_action_inf, self.players_flop_money_in_pot, self.end_of_flop_players_in, "flop")
 
+        """
+        Подсчет стеков игроков к концу флопа
+        """
         for i in self.end_of_flop_stack_sizes.keys():
             self.end_of_flop_stack_sizes[i] = np.round(
                 self.end_of_flop_stack_sizes[i] - self.players_flop_money_in_pot[i], 1)
 
         self.flop_pot_size += sum(self.players_flop_money_in_pot.values())
 
+    """
+    Метод который отвечает за все что происходит на терне
+    """
     def turn_act(self):
+        """
+        Список используемых переменных
+        self.turn_inf
+        self.info
+        self.river_exist
+        self.seats
+        self.turn_card
+        self.players_turn_money_in_pot
+        self.turn_action_inf
+        self.turn_action
+        self.end_of_turn_players_in
+        self.end_of_turn_stack_sizes
+        self.turn_pot_size
+        """
+
+        """Проверка существуют ли еще улицы"""
         self.turn_inf = self.info.split("*** RIVER *** ")[0]
-        try:
+        if "*** RIVER *** " in self.info:
             self.info = self.info.split("*** RIVER *** ")[1]
-        except IndexError:
+        else:
             self.river_exist = False
 
+        """
+        цикл который инициализирует словарь players_turn_money_in_pot
+        """
         for i in self.seats.values():
             self.players_turn_money_in_pot[i] = float()
         self.turn_card = self.turn_inf.split("\n")[0][-3:-1]
@@ -337,14 +379,37 @@ class Hand:
         self.turn_action, self.players_turn_money_in_pot, self.end_of_turn_players_in = self.action(
             self.turn_action_inf, self.players_turn_money_in_pot, self.end_of_turn_players_in, "turn")
 
+        """
+        Подсчет стеков игроков к концу терна
+        """
         for i in self.end_of_turn_stack_sizes.keys():
             self.end_of_turn_stack_sizes[i] = np.round(
                 self.end_of_turn_stack_sizes[i] - self.players_turn_money_in_pot[i], 1)
 
         self.turn_pot_size += sum(self.players_turn_money_in_pot.values())
 
+    """
+    Метод который отвечает за все что происходит на ривере
+    """
     def river_act(self):
+        """
+        Список используемых переменных
+        self.river_inf
+        self.info
+        self.seats
+        self.river_card
+        self.players_river_money_in_pot
+        self.river_action_inf
+        self.river_action
+        self.end_of_river_players_in
+        self.end_of_river_stack_sizes
+        self.river_pot_size
+        """
         self.river_inf = self.info.split("*** SHOWDOWN ***")[0]
+
+        """
+        цикл который инициализирует словарь players_river_money_in_pot
+        """
         for i in self.seats.values():
             self.players_river_money_in_pot[i] = float()
 
@@ -354,6 +419,9 @@ class Hand:
         self.river_action, self.players_river_money_in_pot, self.end_of_river_players_in = self.action(
             self.river_action_inf, self.players_river_money_in_pot, self.end_of_river_players_in, "river")
 
+        """
+        Подсчет стеков игроков к концу ривера
+        """
         for i in self.end_of_river_stack_sizes.keys():
             self.end_of_river_stack_sizes[i] = np.round(
                 self.end_of_river_stack_sizes[i] - self.players_river_money_in_pot[i], 1)
@@ -361,23 +429,57 @@ class Hand:
         self.river_pot_size += sum(self.players_river_money_in_pot.values())
         self.river_pot_size = np.round(self.river_pot_size, 1)
 
+    """
+    Метод структурирующий действия игроков на флопе, подсчет блайндов 
+    внесенных в общий банк на флопе каждым отдельным игроком
+    и определение оставшихся в раздаче игроков после флопа
+    """
     def action(self, action_inf, money_in_pot, end_of_street_players_in, street):
-        street_action_lst = list()
-        mon_in_pot = money_in_pot.copy()
-        end_of_street_pl_in = end_of_street_players_in.copy()
-        for i in action_inf:
-            player_info = list()
-            player_info.append(i.split(": ")[0])
-            try:
-                action = i.split(": ")[1].split()
-            except IndexError:
+        """
+        Список используемых переменных
+        сделать
+        """
 
-                if "Uncalled bet" in i:
-                    player_info = i.split()[-1]
-                    mon_in_pot[player_info] -= np.round(float(i.split()[2][2:-1]) / self.limit, 1)
-                    action = ['Returned uncalled bet', np.round(float(i.split()[2][2:-1]) / self.limit, 1)]
+        street_action_lst = list()
+        mon_in_pot = money_in_pot.copy()  # Инициализируем переменную, которую будем обрабатываеть и в конце вернем
+        end_of_street_pl_in = end_of_street_players_in.copy()  # Инициализируем переменную, которую будем обрабатываеть и в конце вернем
+
+        """
+        Цикл который проходит по списку строк с информацией о действиях игроков на префлопе/флопе/терне/ривере
+        """
+        for string in action_inf:
+            player_info = list()  # Список состоящий из имени игрока и того какое он действие совершил
+            act = string.split(": ")  # Промежуточная переменная во имя оптимихации
+            player_info.append(act[0])
+
+            """
+            Первичная обработка действия которое было совершено. Обычно в текстовом документе все действия записнаны по шаблону:
+            *Имя игрока*: *совершенное действие* *количество вложенных денег(если нужно)*
+            Однако Uncalled bet не следует данному правилу и выглядит:
+            Uncalled bet (*Количество денег*) returned to Hero
+            """
+            if len(act) > 1:
+                action = act[1].split()
+            else:
+                """
+                Этот иф нужен тк в списке строк есть ещё и пустая строка(последняя)
+                Это нужно будет когда нибудь переделать что б было красиво и функционально, но пока что это работает и так
+                """
+                if "Uncalled bet" in string:
+                    act = string.split()
+                    player_info = act[-1]
+                    mon_in_pot[player_info] -= np.round(float(act[2][2:-1]) / self.limit, 1)
+                    action = ['Returned uncalled bet', np.round(float(act[2][2:-1]) / self.limit, 1)]
                     street_action_lst.append([player_info, action])
+                """
+                Uncalled bet это всегда последняя запись в списке с записями, поэтому после нее можно прописать остановку цикла
+                """
                 break
+
+            """
+            Преобразовании действия из текстового в формат списка:
+            [*действие*,  *сколько денег в него было вложено(если необходимо)*]
+            """
             if action[0] == "raises":
                 action = [action[0], np.round(float(action[3][1:]) / self.limit, 1)]
                 mon_in_pot[player_info[0]] = action[1]
@@ -388,15 +490,21 @@ class Hand:
                 action = [action[0], np.round(float(action[1][1:]) / self.limit, 1)]
                 mon_in_pot[player_info[0]] = action[1]
             elif action[0] == "shows":
-                try:
+                """Проверка на то сколько карт показал игрок одну или две"""
+                if len(action) == 3:
                     action = [action[0], [action[1][1:], action[2][:-1]]]
-                except IndexError:
+                else:
                     action = [action[0], [action[1][1:]]]
             elif action[0] == "folds":
                 end_of_street_pl_in[player_info[0]] = False
+            """
+            Добавление действия в список со всеми действиями на данной улице в формате
+            [*Имя игрока*, [*действие*,  *сколько денег в него было вложено*(если необходимо)]]
+            """
             player_info.append(action)
             street_action_lst.append(player_info)
 
+            """Вызов метода определения тегов для раздачи"""
             self.tag_addition(street, player_info)
 
         return street_action_lst, mon_in_pot, end_of_street_pl_in
@@ -486,7 +594,6 @@ class Hand:
         self.rake = np.round(float(self.sum_info.split(" | ")[1].split("$")[1]) / self.limit + float(
             self.sum_info.split(" | ")[2].split("$")[1]) / self.limit, 1)
         self.collected = np.round(self.river_pot_size - self.rake, 1)
-        self.collected_right = np.round(sum(self.winner.values()), 1)
         if "Hero" in self.winner.keys():
             self.hero_wins = True
             self.hero_results = np.round(self.winner["Hero"] + self.end_of_river_stack_sizes["Hero"] - self.stack_sizes["Hero"], 1)
@@ -516,7 +623,6 @@ class Hand:
         self.rake = np.round(float(self.sum_info.split(" | ")[1].split("$")[1]) / self.limit + float(
             self.sum_info.split(" | ")[2].split("$")[1]) / self.limit, 1)
         self.collected = np.round(self.river_pot_size - self.rake, 1)
-        self.collected_right = np.round(sum(self.winner.values()), 1)
         if "Hero" in self.winner.keys():
             self.hero_wins = True
             self.hero_results = np.round(self.winner["Hero"] + self.end_of_river_stack_sizes["Hero"] - self.stack_sizes["Hero"], 1)
