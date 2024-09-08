@@ -437,7 +437,15 @@ class Hand:
     def action(self, action_inf, money_in_pot, end_of_street_players_in, street):
         """
         Список используемых переменных
-        сделать
+        action_inf
+        money_in_pot
+        end_of_street_players_in
+        street
+        street_action_lst
+        mon_in_pot
+        end_of_street_pl_in
+        player_info
+        action
         """
 
         street_action_lst = list()
