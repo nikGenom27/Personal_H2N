@@ -248,11 +248,13 @@ class Hand:
         """
         for i in self.blind_post:
             if len(i) != 0:
-                if i.split()[-1] != "all-in":
-                    self.players_preflop_money_in_pot[i.split()[0][:-1]] += np.round(float(i.split()[-1][1:]) / self.limit, 1)
-                else:
-                    self.players_preflop_money_in_pot[i.split()[0][:-1]] += np.round(
-                        float(i.split()[-4][1:]) / self.limit, 1)
+                player_name = i.split()[0][:-1]
+                if player_name in self.players_preflop_money_in_pot.keys():
+                    if i.split()[-1] != "all-in":
+                        self.players_preflop_money_in_pot[player_name] += np.round(float(i.split()[-1][1:]) / self.limit, 1)
+                    else:
+                        self.players_preflop_money_in_pot[player_name] += np.round(
+                            float(i.split()[-4][1:]) / self.limit, 1)
 
         """
         подготовительное копирование стек сайзов до начала раздачи, что б далее работать уже с 

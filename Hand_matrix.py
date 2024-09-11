@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class HandMatrix:
 
     def __init__(self):

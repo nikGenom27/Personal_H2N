@@ -1,15 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
 import Hand_matrix as hm
-
-"""
-Для Hero префлопа реализовать:
-RFI(добавить для всех позиций), VPIP, 3-bet, 4-bet, PFR(любой рейз на префлопе),
-ATS(отдельно с btn, co, sb), my Fold vs 3bet(мой флод)
-
-Для Поля надо реализовать
-Villain Fold vs my 3bet, Villain Fold vs my 4bet
-"""
 
 
 class Stats:
@@ -45,7 +35,8 @@ class Stats:
     def result_stats_ret(self):
         return {
             "bb/100:": self.hero_results[-1]/len(self.hero_results)*100,
-            "result": self.hero_results[-1]
+            "result": self.hero_results[-1],
+            "data_len": self.data_len
         }
 
     def show_result_plot(self):
@@ -106,17 +97,3 @@ class Stats:
         return {
             "preflop_stats": self.preflop_stats
             }
-
-"""Встроить в руку префлоп теги, что б иметь возможность их сортировать"""
-
-"""Возможные префлоп теги: No_raise_pot, Limp_pot, SRP, 3bet, 4bet, 5bet, hero_in_post_flop, hero_3bet, hero_4bet, hero_RFI,
- hero_isolate, hero_folds_to_RFI, hero_folds_to_3bet, hero_calls_to_RFI, hero_calls_to_3bet, hero_folds_to_4bet, hero_calls_to_4bet,
- hero_5bet, hero_calls_to_5bet, hero_folds_to_5bet
- (возможно в процессе я ещё что нибудь придумаю)"""
-
-"""Пока не знаю как но переделать подсчет матрицы что б он был не такой всратый(как по мне можно сделать более оопшно), то есть
-что б он два раза запускал одну функцию для разных матриц дважды, а не в одной функции считал две разные матрицы
-(для этого вероятно сначала предется доделать теги и уже основываясь на них делать матрицу)"""
-
-"""Встроить в класс Statistics класс Hands, так что б все считалось при одном проходе через базу
-(что б огромную базу рук не приходилось проходить по куче раз, оптимизация хуле)"""

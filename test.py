@@ -13,24 +13,38 @@ inf_lst = list()
 hand_inf_lst = list()
 value = list()
 
-folders = ['NLH 0.02-0.05 01.04.24-30.04.24', 'NLH 0.05-0.10 01.05.24-31.05.24', ]
+folders = [
+    'NLH 0.02-0.05 01.04.24-30.04.24',
+    'NLH 0.05-0.10 01.05.24-31.05.24',
+    'NLH 0.05-0.10 01.06.24-30.06.24',
+    'NLH 0.05-0.10 01.07.24-31.07.24',
+    'R&C 0.05-0.10 01.07.24-31.07.24',
+    'R&C 0.05-0.10 01.08.24-30.08.24',
+]
 
 for l in folders:
     lst_dr = os.listdir(l)
+    print()
+    print(l)
     for f in lst_dr:
+        print(f)
         with open(f"{l}/{f}", 'r') as hand_info:
             inf = hand_info.read().split("\n\n\n")
 
         for hand in inf:
             if hnd.data_can_be_processed(hand):
-                hand_inf = hnd.Hand(hand)
-                print(hand_inf.collected, hand_inf.collected_right)
-                hand_inf_lst.append(hand)
-                inf_lst.append(hand_inf)
                 try:
-                    value.append(hand_inf.hero_results + value[-1])
-                except IndexError:
-                    value.append(hand_inf.hero_results)
+                    hand_inf = hnd.Hand(hand)
+                    hand_inf_lst.append(hand)
+                    inf_lst.append(hand_inf)
+                    try:
+                        value.append(hand_inf.hero_results + value[-1])
+                    except IndexError:
+                        value.append(hand_inf.hero_results)
+                except:
+                    """Сделать распознование кешдропов в раш н кеше они добавляются в местах"""
+                    print(hand)
+                    raise IndexError
 
 stats_upd = stat.Stats(inf_lst)
 stats_upd.pre_flop_stats_upd()
