@@ -638,10 +638,3 @@ class Hand:
             self.hero_results = np.round(self.winner["Hero"] + self.end_of_river_stack_sizes["Hero"] - self.stack_sizes["Hero"], 1)
         else:
             self.hero_results = np.round(self.end_of_river_stack_sizes["Hero"] - self.stack_sizes["Hero"], 1)
-
-
-"""SPR пот это все таки не изолейт пот, так что надо сделать отделный тег для борда когда чел залимпил(upd: 
-это тег limped я просто немного забыл что он существует), 
-и соответственно сделать отдельные теги для лимпованых бордов: 3bet на изол, кол на изол, + надо добавить не только
-теги для хиро, но и для оппов, по карайней мере в хедзап ситуациях
-"""

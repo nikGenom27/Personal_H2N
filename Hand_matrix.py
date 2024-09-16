@@ -57,3 +57,6 @@ class HandMatrix:
             percentages_[type_] = count_[type_] / sum(count_.values())
 
         return [count_, percentages_, value_]
+
+    def hand_matrix_return(self):
+        return self.hand_matrix
