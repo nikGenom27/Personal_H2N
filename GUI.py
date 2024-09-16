@@ -8,59 +8,34 @@ from tkinter import filedialog
 from accessify import private, protected
 
 
-class MainWindow:
+class GUI:
 
     def __init__(self):
+        self.main_win = MainWin()
+        self.main_win.mainloop()
 
-        self.alph_lst = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
 
-        self.inf_lst = list()
-        self.hand_lst = list()
-        self.opened_hands = list()
+class MainWin(Tk):
 
-        self.root = Tk()
-        self.root.title("Main")
-        self.mainframe = ttk.Frame(self.root, padding="3 3 12 12")
-        self.mainframe.grid(column=0, row=0)
+    def __init__(self):
+        super().__init__()
+        self.title("Main")
 
-        self.__hand_listbox_init()
-        self.__menu_init()
+        self.hand_listbox = HandListBoxFrame(self)
+        self.hand_listbox.grid(column=0, row=0, sticky=(N, S, E, W))
 
-        self.root.grid_columnconfigure(0, weight=1)
-        self.root.grid_rowconfigure(0, weight=1)
+        self.main_menu = MainMenu(self)
+        self.main_menu_creation()
 
-        self.root.mainloop()
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
 
-    @protected
-    def __hand_listbox_init(self):
-        self.list_box = Listbox(self.root, height=30, width=50)
-        self.list_box.grid(column=0, row=0, sticky=(N, W, E, S))
-        self.scroll_bar = ttk.Scrollbar(self.root, orient=VERTICAL, command=self.list_box.yview)
-        self.scroll_bar.grid(column=1, row=0, sticky=(N, S))
-        self.list_box['yscrollcommand'] = self.scroll_bar.set
-        ttk.Label(self.root, text="Список раздач", anchor=(W)).grid(column=0, columnspan=2, row=1, sticky=(W, E))
-        self.list_box.bind('<Double-1>', lambda e: self.__hand_description_window_open(self.list_box.curselection()))
+    def main_menu_creation(self):
+        self.main_menu.create_cascade('Файл')
+        self.main_menu.create_menu_sub_button('Файл',
+                                              'Импортировать раздачи', self.menu_hand_import_funk)
 
-    @protected
-    def __menu_init(self):
-        self.menubar = Menu(self.root)
-        self.root['menu'] = self.menubar
-        self.menu_file = Menu(self.menubar)
-        self.menubar.add_cascade(menu=self.menu_file, label='Файл')
-        self.menu_file.add_command(label='Импортировать раздачи', command=self.__hand_import)
-
-    def __add_hand_to_listbox(self, hand):
-
-        text = str()
-        text += self.card_sort(hand.hero_cards) +f' | Результат: {hand.hero_results}бб | '
-
-        if hand.flop_exist:
-            text += f'Флоп: {' '.join(hand.flop_board)}'
-
-        self.list_box.insert('end', text)
-
-    def __hand_import(self):
-        hand_lst = list()
+    def menu_hand_import_funk(self):
         direct = filedialog.askdirectory()
         lst_f = os.listdir(direct)
         for f in lst_f:
@@ -70,83 +45,149 @@ class MainWindow:
             for hand_inf in inf:
                 if hd.data_can_be_processed(hand_inf):
                     hand = hd.Hand(hand_inf)
-                    self.hand_lst.append(hand)
-                    self.__add_hand_to_listbox(hand)
+                    self.hand_listbox.add_hand_to_listbox(hand)
 
-    def __hand_description_window_open(self, indexes):
+
+class MainMenu(Menu):
+
+    def __init__(self, root):
+        super().__init__(root)
+        root['menu'] = self
+        self.menu_buttons = dict()
+
+    def create_cascade(self, menu_cascade_name):
+        self.menu_buttons[menu_cascade_name] = Menu(self)
+        self.add_cascade(menu=self.menu_buttons[menu_cascade_name], label=menu_cascade_name)
+
+    def create_menu_sub_button(self, menu_cascade_name, sub_button_name, button_funk):
+        self.menu_buttons[menu_cascade_name].add_command(label=sub_button_name, command=button_funk)
+
+
+class HandListBoxFrame(ttk.Frame):
+
+    def __init__(self, root):
+        self.hand_list = list()
+        super().__init__(root)
+        self.hand_listbox = Listbox(self, height=30, width=50)
+        self.hand_listbox.grid(column=0, row=0, sticky=(N, W, E, S))
+        self.scroll_bar = ttk.Scrollbar(self, orient=VERTICAL, command=self.hand_listbox.yview)
+        self.scroll_bar.grid(column=1, row=0, sticky=(N, S))
+        self.hand_listbox['yscrollcommand'] = self.scroll_bar.set
+        ttk.Label(self, text="Список раздач", anchor=(W), font=('Arial', 10)).grid(column=0, columnspan=2, row=1, sticky=(W, E))
+        self.hand_listbox.bind('<Double-1>', lambda e: self.open_hand_description_window(self.hand_listbox.curselection()))
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        self.opened_hands = list()
+
+    def open_hand_description_window(self, indexes):
         if indexes[0] not in self.opened_hands:
             self.opened_hands.append(indexes[0])
-            win = Toplevel(self.root)
-            winframe = ttk.Frame(win, padding="3 3 12 12")
-            winframe.grid(column=0, row=0)
-            win.protocol("WM_DELETE_WINDOW", lambda: self.__hand_description_window_destroy(indexes[0], win))
-            hero_cards_text = ttk.Label(win, text="Hero cards:", font=("Arial", 14))
-            hero_position_text = ttk.Label(win, text="Hero position:", font=("Arial", 14))
-            hero_result_text = ttk.Label(win, text="Hero result:", font=("Arial", 14))
+            hand_description_window = Toplevel(self)
+            hand_description_frame = HandDescriptionFrame(hand_description_window, self.hand_list[indexes[0]])
+            hand_description_frame.grid(column=0, row=0)
+            hand_description_window.columnconfigure(0, weight=1)
+            hand_description_window.rowconfigure(0, weight=1)
+            hand_description_window.protocol("WM_DELETE_WINDOW", lambda: self.destroy_hand_description_window(indexes[0], hand_description_window))
 
-            cards_text = self.card_sort(self.hand_lst[indexes[0]].hero_cards).split()
-            card_one_label = ttk.Label(win, text=f"{cards_text[0]}", font=("Arial", 14),
-                                       foreground=self.card_color_choose(cards_text[0]))
-            card_two_label = ttk.Label(win, text=f"{cards_text[1]}", font=("Arial", 14),
-                                       foreground=self.card_color_choose(cards_text[1]))
-            hero_position_label = ttk.Label(win, text=f"{self.hand_lst[indexes[0]].hero_position}", font=("Arial", 14))
-            hero_result_label = ttk.Label(win, text=f"{self.hand_lst[indexes[0]].hero_results}bb", font=("Arial", 14))
-            board_text = ttk.Label(win, text="Board:", font=("Arial", 14))
-
-            hero_cards_text.grid(column=0, row=0, sticky=(W), ipadx=5)
-            card_one_label.grid(column=1, row=0, sticky=(W), ipadx=40)
-            card_two_label.grid(column=1, row=0, sticky=(W), padx=25)
-            hero_position_text.grid(column=0, row=1, sticky=(W), ipadx=5)
-            hero_position_label.grid(column=1, row=1, sticky=(W))
-            hero_result_text.grid(column=0, row=2, sticky=(W), ipadx=5)
-            hero_result_label.grid(column=1, row=2, sticky=(W))
-            board_text.grid(column=3, row=0, sticky=(W), ipadx=10)
-            if self.hand_lst[indexes[0]].flop_exist:
-                flop_board = self.hand_lst[indexes[0]].flop_board
-                flop_board_card_one = ttk.Label(win, text=f"{flop_board[0]}",
-                                                font=("Arial", 14), foreground=self.card_color_choose(flop_board[0]))
-                flop_board_card_one.grid(column=3, row=1, sticky=(W))
-                flop_board_card_two = ttk.Label(win, text=f"{flop_board[1]}",
-                                                font=("Arial", 14), foreground=self.card_color_choose(flop_board[1]))
-                flop_board_card_two.grid(column=3, row=1)
-                flop_board_card_three = ttk.Label(win, text=f"{flop_board[2]}",
-                                                font=("Arial", 14), foreground=self.card_color_choose(flop_board[2]))
-                flop_board_card_three.grid(column=3, row=1, sticky=(E))
-                if self.hand_lst[indexes[0]].turn_exist:
-                    turn_card = self.hand_lst[indexes[0]].turn_card
-                    turn_card_label = ttk.Label(win, text=f"{turn_card}",
-                                                    font=("Arial", 14),
-                                                    foreground=self.card_color_choose(turn_card))
-                    turn_card_label.grid(column=4, row=1, sticky=(W))
-                    if self.hand_lst[indexes[0]].river_exist:
-                        river_card = self.hand_lst[indexes[0]].river_card
-                        river_card_label = ttk.Label(win, text=f"{turn_card}",
-                                                        font=("Arial", 14),
-                                                        foreground=self.card_color_choose(river_card))
-                        river_card_label.grid(column=5, row=1, sticky=(W))
-
-    def __hand_description_window_destroy(self, index, win):
+    def destroy_hand_description_window(self, index, win):
         self.opened_hands.pop(self.opened_hands.index(index))
         win.destroy()
 
-    def card_sort(self, cards):
-        alph_card_idx = sorted(
-            [self.alph_lst.index(cards[0][0]), self.alph_lst.index(cards[1][0])])
-        if cards[0][0] == self.alph_lst[alph_card_idx[0]]:
-            return f'{self.alph_lst[alph_card_idx[0]]}{cards[0][1]} {self.alph_lst[alph_card_idx[1]]}{cards[1][1]}'
-        else:
-            return f'{self.alph_lst[alph_card_idx[0]]}{cards[1][1]} {self.alph_lst[alph_card_idx[1]]}{cards[0][1]}'
+    def add_hand_to_listbox(self, hand):
+        self.hand_list.append(hand)
+        text = str()
+        text += card_sort(hand.hero_cards) + f' | Результат: {hand.hero_results}бб | '
 
-    @staticmethod
-    def card_color_choose(card):
-        if card[-1] == 's':
-            return 'black'
-        elif card[-1] == 'h':
-            return 'red'
-        elif card[-1] == 'd':
-            return 'blue'
-        elif card[-1] == 'c':
-            return 'green'
+        if hand.flop_exist:
+            text += f'Флоп: {' '.join(hand.flop_board)}'
+
+        self.hand_listbox.insert('end', text)
+
+
+class HandDescriptionFrame(ttk.Frame):
+
+    def __init__(self, root, hand):
+        self.hand = hand
+        super().__init__(root)
+
+        self.hero_cards_visualisation()
+        self.hero_position_visualisation()
+        self.hero_result_visualisation()
+        self.board_visualisation()
+
+    def hero_cards_visualisation(self):
+        hero_cards_text = ttk.Label(self, text="Hero cards:", font=("Arial", 14))
+        cards_text = card_sort(self.hand.hero_cards).split()
+        card_one_label = ttk.Label(self, text=f"{cards_text[0]}", font=("Arial", 14),
+                                   foreground=card_color_choose(cards_text[0]))
+        card_two_label = ttk.Label(self, text=f"{cards_text[1]}", font=("Arial", 14),
+                                   foreground=card_color_choose(cards_text[1]))
+        hero_cards_text.grid(column=0, row=0, sticky=(W), ipadx=5)
+        card_one_label.grid(column=1, row=0, sticky=(W), ipadx=40)
+        card_two_label.grid(column=1, row=0, sticky=(W), padx=30)
+
+    def hero_position_visualisation(self):
+        hero_position_text = ttk.Label(self, text="Hero position:", font=("Arial", 14))
+        hero_position_label = ttk.Label(self, text=f"{self.hand.hero_position}", font=("Arial", 14))
+        hero_position_text.grid(column=0, row=1, sticky=(W), ipadx=5)
+        hero_position_label.grid(column=1, row=1, sticky=(W))
+
+    def hero_result_visualisation(self):
+        hero_result_text = ttk.Label(self, text="Hero result:", font=("Arial", 14))
+        hero_result_label = ttk.Label(self, text=f"{self.hand.hero_results}bb", font=("Arial", 14))
+        hero_result_text.grid(column=0, row=2, sticky=(W), ipadx=5)
+        hero_result_label.grid(column=1, row=2, sticky=(W))
+
+    def board_visualisation(self):
+        board_text = ttk.Label(self, text="Board:", font=("Arial", 14))
+        board_text.grid(column=3, row=0, sticky=(W), ipadx=10)
+        if self.hand.flop_exist:
+            flop_board = self.hand.flop_board
+            flop_board_card_one = ttk.Label(self, text=f"{flop_board[0]}",
+                                            font=("Arial", 14), foreground=card_color_choose(flop_board[0]))
+            flop_board_card_one.grid(column=3, row=1, sticky=(W))
+            flop_board_card_two = ttk.Label(self, text=f"{flop_board[1]}",
+                                            font=("Arial", 14), foreground=card_color_choose(flop_board[1]))
+            flop_board_card_two.grid(column=3, row=1)
+            flop_board_card_three = ttk.Label(self, text=f"{flop_board[2]}",
+                                              font=("Arial", 14), foreground=card_color_choose(flop_board[2]))
+            flop_board_card_three.grid(column=3, row=1, sticky=(E))
+            if self.hand.turn_exist:
+                turn_card = self.hand.turn_card
+                turn_card_label = ttk.Label(self, text=f"{turn_card}",
+                                            font=("Arial", 14),
+                                            foreground=card_color_choose(turn_card))
+                turn_card_label.grid(column=4, row=1, sticky=(W))
+                if self.hand.river_exist:
+                    river_card = self.hand.river_card
+                    river_card_label = ttk.Label(self, text=f"{turn_card}",
+                                                 font=("Arial", 14),
+                                                 foreground=card_color_choose(river_card))
+                    river_card_label.grid(column=5, row=1, sticky=(W))
+
+
+def card_sort(cards):
+    alph_lst = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
+
+    alph_card_idx = sorted(
+        [alph_lst.index(cards[0][0]), alph_lst.index(cards[1][0])])
+    if cards[0][0] == alph_lst[alph_card_idx[0]]:
+        return f'{alph_lst[alph_card_idx[0]]}{cards[0][1]} {alph_lst[alph_card_idx[1]]}{cards[1][1]}'
+    else:
+        return f'{alph_lst[alph_card_idx[0]]}{cards[1][1]} {alph_lst[alph_card_idx[1]]}{cards[0][1]}'
+
+
+def card_color_choose(card):
+    if card[-1] == 's':
+        return 'black'
+    elif card[-1] == 'h':
+        return 'red'
+    elif card[-1] == 'd':
+        return 'blue'
+    elif card[-1] == 'c':
+        return 'green'
+
 
 if __name__ == '__main__':
-    MainWindow()
+    GUI()
