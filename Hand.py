@@ -41,6 +41,7 @@ class Hand:
         self.limit = float()  # Сколько в одном блайнде долларов
         self.seats = dict()  # key: номер позиции(циффра), value: никнейм игрока
         self.positions = dict()  # key: никнейм игрока, value: его позиция
+        self.niknames_from_positions = dict() #  key: позиция, value: никнейм игрока
         self.players_at_table = int()  # Количество игроков за столом
 
         self.limit = float(self.common_inf.split("/$")[1].split(")")[0])
@@ -49,6 +50,7 @@ class Hand:
         """Pre-flop"""
         # vars init
         self.preflop_tags = {"pot_type": "No_action", "Hero_action_tags": [], "Position_action_tags": {}}  # список тегов на префлопе
+        self.blind_post_action = list()
         self.preflop_pot_size = float()
         self.players_preflop_money_in_pot = dict()  # key: никнейм игрока, value: сколько блайндов он внес в общий банк на префлопе
         self.end_of_preflop_players_in = dict()  # key: никнейм игрока, value: True/False остался ли игрок в раздаче к концу префлопа
@@ -212,6 +214,7 @@ class Hand:
 
         for i in range(self.players_at_table):
             self.positions[self.players_lst[(i + seat_lst.index(self.btn_seat)) % self.players_at_table]] = positions_lst[i]
+            self.niknames_from_positions[positions_lst[i]] = self.players_lst[(i + seat_lst.index(self.btn_seat)) % self.players_at_table]
 
         self.hero_position = self.positions['Hero']
 
@@ -252,9 +255,13 @@ class Hand:
                 if player_name in self.players_preflop_money_in_pot.keys():
                     if i.split()[-1] != "all-in":
                         self.players_preflop_money_in_pot[player_name] += np.round(float(i.split()[-1][1:]) / self.limit, 1)
+                        self.blind_post_action.append(
+                            [player_name, ['blind posts', np.round(float(i.split()[-1][1:]) / self.limit, 1)]])
                     else:
                         self.players_preflop_money_in_pot[player_name] += np.round(
                             float(i.split()[-4][1:]) / self.limit, 1)
+                        self.blind_post_action.append(
+                            [player_name, ['blind posts', np.round(float(i.split()[-4][1:]) / self.limit, 1)]])
 
         """
         подготовительное копирование стек сайзов до начала раздачи, что б далее работать уже с 
@@ -277,8 +284,12 @@ class Hand:
         self.preflop_action_inf = self.preflop_inf.split("\n")[self.players_at_table+1:-1]  # отделение информации о действиях на префлопе
         self.hero_cards = self.preflop_inf.split('Dealt to Hero [')[1].split("]")[0].split()  # определение карт игрока
 
+        self.end_of_preflop_players_in = {i: True for i in self.positions.keys()}
+
         self.preflop_action, self.players_preflop_money_in_pot, self.end_of_preflop_players_in = self.action(
             self.preflop_action_inf, self.players_preflop_money_in_pot, self.end_of_preflop_players_in, "pre-flop")
+
+        self.preflop_action = self.blind_post_action + self.preflop_action
 
         """
         Подсчет стеков игроков к концу префлопа
@@ -287,6 +298,7 @@ class Hand:
             self.end_of_preflop_stack_sizes[i] = np.round(self.end_of_preflop_stack_sizes[i] - self.players_preflop_money_in_pot[i], 1)
 
         self.preflop_pot_size = sum(self.players_preflop_money_in_pot.values())
+        self.preflop_pot_size = np.round(self.preflop_pot_size, 1)
 
     """
     Метод который отвечает за все что происходит на флопе
@@ -343,6 +355,7 @@ class Hand:
                 self.end_of_flop_stack_sizes[i] - self.players_flop_money_in_pot[i], 1)
 
         self.flop_pot_size += sum(self.players_flop_money_in_pot.values())
+        self.flop_pot_size = np.round(self.flop_pot_size, 1)
 
     """
     Метод который отвечает за все что происходит на терне
@@ -389,6 +402,7 @@ class Hand:
                 self.end_of_turn_stack_sizes[i] - self.players_turn_money_in_pot[i], 1)
 
         self.turn_pot_size += sum(self.players_turn_money_in_pot.values())
+        self.turn_pot_size = np.round(self.turn_pot_size, 1)
 
     """
     Метод который отвечает за все что происходит на ривере
@@ -500,11 +514,12 @@ class Hand:
                 action = [action[0], np.round(float(action[1][1:]) / self.limit, 1)]
                 mon_in_pot[player_info[0]] = action[1]
             elif action[0] == "shows":
-                """Проверка на то сколько карт показал игрок одну или две"""
+                action = ' '.join(action)
+                action = action.split('(')[0].split()
                 if len(action) == 3:
-                    action = [action[0], [action[1][1:], action[2][:-1]]]
+                    action = [action[0], [action[1][1:3], action[2][-3:-1]]]
                 else:
-                    action = [action[0], [action[1][1:]]]
+                    action = [action[0], [action[1][1:3]]]
             elif action[0] == "folds":
                 end_of_street_pl_in[player_info[0]] = False
             """
@@ -638,3 +653,9 @@ class Hand:
             self.hero_results = np.round(self.winner["Hero"] + self.end_of_river_stack_sizes["Hero"] - self.stack_sizes["Hero"], 1)
         else:
             self.hero_results = np.round(self.end_of_river_stack_sizes["Hero"] - self.stack_sizes["Hero"], 1)
+
+    def __repr__(self):
+        return self.hero_results
+
+    def __str__(self):
+        return str(self.hero_results)

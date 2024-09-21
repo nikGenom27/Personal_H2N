@@ -4,30 +4,26 @@ import numpy as np
 import Statistics_upd as stat
 import os
 import Hand as hnd
+from HandSorting import HandList
 
 # path = 'NLH 0.02-0.05 01.04.24-30.04.24'
 # path = 'NLH 0.05-0.10 01.05.24-31.05.24'
 
 
-inf_lst = list()
+inf_lst = HandList()
 hand_inf_lst = list()
 value = list()
 
 folders = [
-    'NLH 0.02-0.05 01.04.24-30.04.24',
-    'NLH 0.05-0.10 01.05.24-31.05.24',
+    'NLH 0.02-0.05 01.04.24-30.04.24',]
+"""    'NLH 0.05-0.10 01.05.24-31.05.24',
     'NLH 0.05-0.10 01.06.24-30.06.24',
     'NLH 0.05-0.10 01.07.24-31.07.24',
     'R&C 0.05-0.10 01.07.24-31.07.24',
-    'R&C 0.05-0.10 01.08.24-30.08.24',
-]
-
+    'R&C 0.05-0.10 01.08.24-30.08.24',"""
 for l in folders:
     lst_dr = os.listdir(l)
-    print()
-    print(l)
     for f in lst_dr:
-        print(f)
         with open(f"{l}/{f}", 'r') as hand_info:
             inf = hand_info.read().split("\n\n\n")
 
@@ -42,10 +38,12 @@ for l in folders:
                     except IndexError:
                         value.append(hand_inf.hero_results)
                 except:
-                    """Сделать распознование кешдропов в раш н кеше они добавляются в местах"""
-                    print(hand)
                     raise IndexError
 
+sorteddd = inf_lst.ret_pot_size_filtered(90, 100).ret_hero_in_post_flop_filtered().ret_sorted_by_results()
+for i in sorteddd:
+    print(i, end=" ")
+"""
 stats_upd = stat.Stats(inf_lst)
 stats_upd.pre_flop_stats_upd()
 stats_inf = stats_upd.pre_flop_stats_ret_upd()
@@ -71,7 +69,7 @@ for stat in stats_inf["preflop_stats"]:
 stats_upd.result_stats()
 result = stats_upd.result_stats_ret()
 for hand in result:
-    print(hand, result[hand])
+    print(hand, result[hand])"""
 """
 hand_dct = stats.ret_hand_matrix_value()
 alph_lst = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]

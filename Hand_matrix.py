@@ -5,7 +5,6 @@ class HandMatrix:
         self.hand_matrix = dict()
         self.alph_lst = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]  # данный порядок крайне важен
         self.cur_cards = str()
-
         self.matrix_creation()
 
     def matrix_creation(self):
