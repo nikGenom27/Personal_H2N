@@ -41,7 +41,7 @@ class Hand:
         self.limit = float()  # Сколько в одном блайнде долларов
         self.seats = dict()  # key: номер позиции(циффра), value: никнейм игрока
         self.positions = dict()  # key: никнейм игрока, value: его позиция
-        self.niknames_from_positions = dict() #  key: позиция, value: никнейм игрока
+        self.niknames_from_positions = dict()  # key: позиция, value: никнейм игрока
         self.players_at_table = int()  # Количество игроков за столом
 
         self.limit = float(self.common_inf.split("/$")[1].split(")")[0])

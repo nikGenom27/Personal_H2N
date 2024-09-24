@@ -22,13 +22,14 @@ class MainWin(Tk):
         super().__init__()
         self.title("Main")
         self.hand_list = HandList()
+        self.minsize(width=700, height=400)
 
         self.mainframe = ttk.Frame(self, padding="3 3 12 12")
         self.mainframe.grid(row=0, column=0, sticky=(N, S, E, W))
 
         self.hand_listbox = HandListBoxFrame(self.mainframe)
         self.hand_listbox.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.hand_sort = HandSortingFrame(self.mainframe, self.filter_btn_funk)
+        self.hand_sort = HandSortingFrame(self.mainframe, self.filter_btn_funk, self.reset_btn_funk)
         self.hand_sort.grid(column=1, row=0, sticky=(N, S, E, W))
         self.last_filter_preset = dict()
 
@@ -73,11 +74,20 @@ class MainWin(Tk):
             filtered_list = filtered_list.ret_hero_in_post_flop_filtered()
 
         filtered_list = filtered_list.ret_hero_position_filtered([i for i in filters['hero_positions'].keys() if filters['hero_positions'][i]])
+        if filters['advanced_filters']:
+            filtered_list = filtered_list.ret_hero_preflop_action_filtered([i for i in filters['hero_preflop_action_tags'].keys() if filters['hero_preflop_action_tags'][i]])
 
         for i in filtered_list:
             self.hand_listbox.add_hand_to_listbox(i)
 
         self.last_filter_preset = filters
+
+    def reset_btn_funk(self):
+        self.last_filter_preset = dict()
+        if len(self.hand_listbox.hand_list) != len(self.hand_list):
+            self.hand_listbox.delete_all_hands()
+            for i in self.hand_list:
+                self.hand_listbox.add_hand_to_listbox(i)
 
 
 class MainMenu(Menu):
@@ -100,12 +110,16 @@ class HandListBoxFrame(ttk.Frame):
     def __init__(self, root):
         self.hand_list = HandList()
         super().__init__(root)
-        self.hand_listbox = Listbox(self, height=30, width=50)
+        self.hand_listbox = Listbox(self, height=30, width=10)
         self.hand_listbox.grid(column=0, row=0, sticky=(N, W, E, S))
         self.scroll_bar = ttk.Scrollbar(self, orient=VERTICAL, command=self.hand_listbox.yview)
         self.scroll_bar.grid(column=1, row=0, sticky=(N, S))
         self.hand_listbox['yscrollcommand'] = self.scroll_bar.set
-        ttk.Label(self, text="Список раздач", anchor=(W), font=('Arial', 10)).grid(column=0, columnspan=2, row=1, sticky=(W, E))
+
+        self.stat_btn_frame = ttk.Frame(self)
+        self.statistics_button = ttk.Button(self.stat_btn_frame, text="Рассчитать статистику", command=self.stats)
+        self.statistics_button.grid(column=1, row=0, sticky=(E))
+        self.stat_btn_frame.grid(column=0, row=1, columnspan=2, sticky=(W))
         self.hand_listbox.bind('<Double-1>', lambda e: self.open_hand_description_window(self.hand_listbox.curselection()))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -137,27 +151,65 @@ class HandListBoxFrame(ttk.Frame):
         self.hand_list = HandList()
         self.hand_listbox.delete(0, "end")
 
+    def stats(self):
+        statistics = stat.Stats(self.hand_list)
+        statistics.pre_flop_stats_upd()
+        stats_inf = statistics.pre_flop_stats_ret_upd()
+        statistics.result_stats()
+        over_all_stats = statistics.result_stats_ret()
+
+        print(stats_inf)
+        print(over_all_stats)
+
 
 class HandSortingFrame(ttk.Frame):
-    def __init__(self, root, filter_btn_funk):
+    def __init__(self, root, filter_btn_funk, reset_btn_funk):
         super().__init__(root)
 
         self.filter_by_pot_size_frame = FilterByPotSizeFrame(self)
         self.hero_in_postflop_frame = HeroInFrame(self)
         self.filter_by_pos = FilterByHeroPositionFrame(self)
-        self.filter_by_pot_size_frame.grid(row=0, column=0)
-        self.hero_in_postflop_frame.grid(row=1, column=0)
-        self.filter_by_pos.grid(row=0, column=1)
-        self.filter_button = ttk.Button(self, text="Фильтр", command=filter_btn_funk)
-        self.filter_button.grid(row=4, column=0)
+
+        self.more_filters_frame = ttk.Frame(self)
+        self.filter_by_hero_preflop_action = FilteredByHeroPreflopActionsFrame(self.more_filters_frame)
+        self.filter_by_hero_preflop_action.grid(row=0, column=0)
+        self.more_filters_frame.grid(row=0, column=1, rowspan=4)
+        self.more_filters_frame.grid_remove()
+
+        self.hero_in_postflop_frame.grid(row=2, column=0, sticky=(N, W))
+        self.filter_by_pot_size_frame.grid(row=0, column=0, sticky=(N, W))
+        self.filter_by_pos.grid(row=1, column=0, sticky=(N, W))
+
+        self.buttons_frame = ttk.Frame(self)
+        self.filter_button = ttk.Button(self.buttons_frame, text="Фильтр", command=filter_btn_funk)
+        self.reset_button = ttk.Button(self.buttons_frame, text="Сброс", command=reset_btn_funk)
+
+        self.more_filters_flag = False
+        self.more_filters_button = ttk.Button(self.buttons_frame, text='Расширить', command=self.more_filters_funk)
+        self.filter_button.grid(row=0, column=0)
+        self.reset_button.grid(row=0, column=1)
+        self.more_filters_button.grid(row=0, column=2)
+        self.buttons_frame.grid(row=4, column=0, columnspan=10)
+
+    def more_filters_funk(self):
+        if self.more_filters_flag:
+            self.more_filters_button['text'] = 'Расширить'
+            self.more_filters_frame.grid_remove()
+            self.more_filters_flag = False
+        else:
+            self.more_filters_button['text'] = 'Свернуть'
+            self.more_filters_frame.grid()
+            self.more_filters_flag = True
 
     def ret_selected_filters(self):
         minimum, maximum = self.filter_by_pot_size_frame.ret_min_max_pot_sizes()
         filtered_dct = {
+            'advanced_filters': self.more_filters_flag,
             'pot_size_min': minimum,
             'pot_size_max': maximum,
             'hero_in_postflop': self.hero_in_postflop_frame.ret_hero_in_enabled(),
-            'hero_positions': self.filter_by_pos.ret_hero_in_enabled()
+            'hero_positions': self.filter_by_pos.ret_hero_in_enabled(),
+            'hero_preflop_action_tags': self.filter_by_hero_preflop_action.ret_action_tag_enabled()
         }
         return filtered_dct
 
@@ -210,7 +262,7 @@ class FilterByHeroPositionFrame(ttk.Frame):
         self.positions = ['SB', 'BB', 'UTG', 'HJ', 'CO', 'BTN']
         super().__init__(root, padding="3 3 3 3")
         self.enabled = [IntVar() for i in range(6)]
-        self.hero_position_label = ttk.Label(self, text="Фильтр по позиции hero", font=("Arial", 10))
+        self.hero_position_label = ttk.Label(self, text="Фильтр по позиции Hero", font=("Arial", 10))
         self.hero_position_label.grid(row=0, column=0, columnspan=2)
         for i in range(3):
             for j in range(2):
@@ -219,7 +271,35 @@ class FilterByHeroPositionFrame(ttk.Frame):
                 self.hero_in_checkbox.grid(row=i+1, column=j, sticky=('W'))
 
     def ret_hero_in_enabled(self):
-        filtered = {self.positions[i]: float(self.enabled[i].get()) for i in range(6)}
+        filtered = {self.positions[i]: float(self.enabled[i].get()) for i in range(len(self.positions))}
+        return filtered
+
+
+"""
+Не дописано, дописать
+"""
+
+
+class FilteredByHeroPreflopActionsFrame(ttk.Frame):
+
+    def __init__(self, root):
+        super().__init__(root, padding="3 3 3 3")
+        self.hero_actions = ['hero_calls', 'hero_calls_against_Limp', 'hero_calls_against_Isolate',
+                             'hero_calls_against_RFI', 'hero_calls_against_3bet', 'hero_calls_against_4bet',
+                             'hero_calls_against_5bet', 'hero_raises', 'hero_raises_against_Limp',
+                             'hero_raises_against_Isolate', 'hero_raises_against_RFI', 'hero_raises_against_3bet',
+                             'hero_raises_against_4bet']
+        self.enabled = [IntVar() for i in range(len(self.hero_actions))]
+        self.selection_enabled = IntVar()
+        self.hero_action_label = ttk.Label(self, text="Фильтр по действиям Hero на префлопе", font=("Arial", 10))
+        self.hero_action_label.grid(row=0, column=0, columnspan=2)
+        for i in range(len(self.hero_actions)):
+            self.hero_action_checkbox = ttk.Checkbutton(self, text=self.hero_actions[i], variable=self.enabled[i])
+            self.hero_action_checkbox.invoke()
+            self.hero_action_checkbox.grid(row=i % (len(self.hero_actions)//2 + 1) + 1, column=int(i > len(self.hero_actions)//2), sticky=('W'))
+
+    def ret_action_tag_enabled(self):
+        filtered = {self.hero_actions[i]: float(self.enabled[i].get()) for i in range(len(self.hero_actions))}
         return filtered
 
 

@@ -19,11 +19,21 @@ class HandList(list):
         return filtered_lst
 
     def ret_hero_in_post_flop_filtered(self):
-        filtered_lst = HandList(filter(lambda x: x.end_of_flop_players_in["Hero"], self))
+        filtered_lst = HandList(filter(lambda x: x.end_of_preflop_players_in["Hero"] and sum(x.end_of_preflop_players_in.values()) > 1, self))
         return filtered_lst
 
     def ret_hero_position_filtered(self, positions: list):
         filtered_lst = HandList(filter(lambda x: x.hero_position in positions, self))
         return filtered_lst
 
-"""Добавить фильтрацию по рукам, по позициям оппонентов"""
+    def ret_hero_preflop_action_filtered(self, action: list):
+        filtered_lst = HandList()
+        for act in action:
+            filtered_lst = filtered_lst + HandList(filter(lambda x: act in x.preflop_tags['Hero_action_tags'], self))
+        return filtered_lst
+
+"""
+по позициям оппонентов, Добавить фильтрацию по рукам, 
+по количеству оппов в раздаче(пока разделение на два класса heads up и мультипот),
+по действиям оппов
+"""
