@@ -29,7 +29,7 @@ class HandList(list):
     def ret_hero_preflop_action_filtered(self, action: list):
         filtered_lst = HandList()
         for act in action:
-            filtered_lst = filtered_lst + HandList(filter(lambda x: act in x.preflop_tags['Hero_action_tags'], self))
+            filtered_lst = filtered_lst + HandList(filter(lambda x: act in ' '.join(x.preflop_tags['Hero_action_tags']), self))
         return filtered_lst
 
 """

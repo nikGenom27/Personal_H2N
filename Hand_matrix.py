@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class HandMatrix:
 
     def __init__(self):
@@ -44,6 +47,7 @@ class HandMatrix:
         count_ = dict()
         percentages_ = dict()
         value_ = dict()
+        value_per_hund = dict()
         for cards in self.hand_matrix.keys():
             for type_ in self.hand_matrix[cards].keys():
                 if type_ not in count_.keys():
@@ -54,8 +58,10 @@ class HandMatrix:
                 value_[type_] += self.hand_matrix[cards][type_]["value"]
         for type_ in percentages_.keys():
             percentages_[type_] = count_[type_] / sum(count_.values())
+            value_per_hund[type_] = np.round(value_[type_] / count_[type_] * 100, 1)
 
-        return [count_, percentages_, value_]
+        return {"hand_count": count_, "percentages": percentages_,
+                "total_value": value_, "value_per_100_hand": value_per_hund}
 
     def hand_matrix_return(self):
         return self.hand_matrix

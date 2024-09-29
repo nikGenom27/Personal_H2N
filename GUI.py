@@ -117,7 +117,7 @@ class HandListBoxFrame(ttk.Frame):
         self.hand_listbox['yscrollcommand'] = self.scroll_bar.set
 
         self.stat_btn_frame = ttk.Frame(self)
-        self.statistics_button = ttk.Button(self.stat_btn_frame, text="Рассчитать статистику", command=self.stats)
+        self.statistics_button = ttk.Button(self.stat_btn_frame, text="Рассчитать статистику", command=self.calculate_stats)
         self.statistics_button.grid(column=1, row=0, sticky=(E))
         self.stat_btn_frame.grid(column=0, row=1, columnspan=2, sticky=(W))
         self.hand_listbox.bind('<Double-1>', lambda e: self.open_hand_description_window(self.hand_listbox.curselection()))
@@ -151,15 +151,29 @@ class HandListBoxFrame(ttk.Frame):
         self.hand_list = HandList()
         self.hand_listbox.delete(0, "end")
 
-    def stats(self):
+    def calculate_stats(self):
         statistics = stat.Stats(self.hand_list)
         statistics.pre_flop_stats_upd()
         stats_inf = statistics.pre_flop_stats_ret_upd()
         statistics.result_stats()
         over_all_stats = statistics.result_stats_ret()
 
-        print(stats_inf)
+        statistics_window = Toplevel(self)
+
         print(over_all_stats)
+        for stati in stats_inf["preflop_stats"]:
+            print(stati)
+            if type(stats_inf["preflop_stats"][stati]) is float:
+                print(stats_inf["preflop_stats"][stati])
+                print()
+            else:
+                for pos in stats_inf["preflop_stats"][stati].keys():
+                    stat_dct = stats_inf["preflop_stats"][stati][pos]["Avg"].overall_count_return()
+                    print(f"\t{pos}")
+                    for stat_type_ in stat_dct.keys():
+                        print(f"\t\t{stat_type_} {stat_dct[stat_type_]}")
+
+                print()
 
 
 class HandSortingFrame(ttk.Frame):
@@ -284,11 +298,9 @@ class FilteredByHeroPreflopActionsFrame(ttk.Frame):
 
     def __init__(self, root):
         super().__init__(root, padding="3 3 3 3")
-        self.hero_actions = ['hero_calls', 'hero_calls_against_Limp', 'hero_calls_against_Isolate',
-                             'hero_calls_against_RFI', 'hero_calls_against_3bet', 'hero_calls_against_4bet',
-                             'hero_calls_against_5bet', 'hero_raises', 'hero_raises_against_Limp',
-                             'hero_raises_against_Isolate', 'hero_raises_against_RFI', 'hero_raises_against_3bet',
-                             'hero_raises_against_4bet']
+        self.hero_actions = ['against_NoAction', 'against_Limp', 'against_Isolate',
+                             'against_RFI', 'against_3bet', 'against_4bet',
+                             'against_5bet']
         self.enabled = [IntVar() for i in range(len(self.hero_actions))]
         self.selection_enabled = IntVar()
         self.hero_action_label = ttk.Label(self, text="Фильтр по действиям Hero на префлопе", font=("Arial", 10))
@@ -296,7 +308,7 @@ class FilteredByHeroPreflopActionsFrame(ttk.Frame):
         for i in range(len(self.hero_actions)):
             self.hero_action_checkbox = ttk.Checkbutton(self, text=self.hero_actions[i], variable=self.enabled[i])
             self.hero_action_checkbox.invoke()
-            self.hero_action_checkbox.grid(row=i % (len(self.hero_actions)//2 + 1) + 1, column=int(i > len(self.hero_actions)//2), sticky=('W'))
+            self.hero_action_checkbox.grid(row=i+1, column=0, sticky=('W'))
 
     def ret_action_tag_enabled(self):
         filtered = {self.hero_actions[i]: float(self.enabled[i].get()) for i in range(len(self.hero_actions))}

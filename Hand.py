@@ -541,7 +541,7 @@ class Hand:
             if player_info[1][0] == "raises":
                 if player_info[0] == "Hero":
                     if self.preflop_tags["pot_type"] == "No_action":
-                        self.preflop_tags["Hero_action_tags"].append("hero_raises")
+                        self.preflop_tags["Hero_action_tags"].append("hero_raises_against_NoAction")
                     elif self.preflop_tags["pot_type"] == "Limp":
                         self.preflop_tags["Hero_action_tags"].append("hero_raises_against_Limp")
                     elif self.preflop_tags["pot_type"] == "Isolate":
@@ -569,7 +569,7 @@ class Hand:
             elif player_info[1][0] == "calls":
                 if player_info[0] == "Hero":
                     if self.preflop_tags["pot_type"] == "No_action":
-                        self.preflop_tags["Hero_action_tags"].append("hero_calls")
+                        self.preflop_tags["Hero_action_tags"].append("hero_calls_against_NoAction")
                     elif self.preflop_tags["pot_type"] == "Limp":
                         self.preflop_tags["Hero_action_tags"].append("hero_calls_against_Limp")
                     elif self.preflop_tags["pot_type"] == "Isolate":
@@ -591,7 +591,7 @@ class Hand:
             elif player_info[1][0] == "folds":
                 if player_info[0] == "Hero":
                     if self.preflop_tags["pot_type"] == "No_action":
-                        self.preflop_tags["Hero_action_tags"].append("hero_folds")
+                        self.preflop_tags["Hero_action_tags"].append("hero_folds_against_NoAction")
                     elif self.preflop_tags["pot_type"] == "Limp":
                         self.preflop_tags["Hero_action_tags"].append("hero_folds_against_Limp")
                     elif self.preflop_tags["pot_type"] == "Isolate":
