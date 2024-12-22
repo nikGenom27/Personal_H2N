@@ -17,7 +17,7 @@ class Stats:
             "against_Isolate": dict(),
             "against_RFI": dict(),
             "against_3bet": dict(),
-            "against_3bet_noRaiseYet": dict(),
+            "against_3bet_NoHeroIn": dict(),
             "against_4bet": dict(),
             "against_4bet_cold": dict(),
             "against_5bet": dict()
@@ -34,7 +34,7 @@ class Stats:
 
     def result_stats_ret(self):
         return {
-            "bb/100:": self.hero_results[-1]/len(self.hero_results)*100,
+            "bb/100": self.hero_results[-1]/len(self.hero_results)*100,
             "result": self.hero_results[-1],
             "data_len": self.data_len
         }
@@ -61,8 +61,8 @@ class Stats:
                     if "NoAction" in tag_:
                         self.add_to_hand_matrix(hand, tag_[1], "_".join([tag_[2], tag_[3]]))
                     elif "Limp" not in hand.preflop_tags["Position_action_tags"].keys():
-                        if tag_[-1] == "3bet" and hand.preflop_tags["Position_action_tags"]["RFI"] != hand.hero_position:
-                            self.add_to_hand_matrix(hand, tag_[1], "against_3bet_noRaiseYet")
+                        if tag_[-1] == "3bet" and tag == hand.preflop_tags["Hero_action_tags"][0]:
+                            self.add_to_hand_matrix(hand, tag_[1], "against_3bet_NoHeroIn")
                         elif tag_[-1] == "4bet" and hand.preflop_tags["Position_action_tags"]["4bet"] != hand.preflop_tags["Position_action_tags"]["RFI"]:
                             self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, tag_[1], "against_4bet_cold", tag_[3])
                         else:
@@ -71,20 +71,35 @@ class Stats:
                         """В лимпы нужно запихнуть статистику изолейтов, 3бетов против изолейтов, колов 3бетов в изолах"""
                         self.add_to_hand_matrix_taking_into_account_opponent_pos(hand, tag_[1], "_".join([tag_[2], tag_[3]]), tag_[3])
 
+        """добавить усреднение"""
+
         self.preflop_stats["VPIP"] = (self.preflop_stats["VPIP"] / self.data_len) * 100
 
         self.preflop_stats["PFR"] = (self.preflop_stats["PFR"] / self.data_len) * 100
 
     def add_to_hand_matrix(self, hand, matrix_type, stat_type):
+        if "Avg" not in self.preflop_stats[stat_type].keys():
+            self.preflop_stats[stat_type]["Avg"] = hm.HandMatrix()
+
         if hand.hero_position not in self.preflop_stats[stat_type].keys():
             self.preflop_stats[stat_type][hand.hero_position] = dict()
             self.preflop_stats[stat_type][hand.hero_position]["Avg"] = hm.HandMatrix()
         self.preflop_stats[stat_type][hand.hero_position]["Avg"].add(hand.hero_cards, matrix_type, hand.hero_results)
 
+        # усреднение(без учета позиции)
+        self.preflop_stats[stat_type]["Avg"].add(hand.hero_cards, matrix_type, hand.hero_results)
+
+        self.preflop_stats[stat_type][hand.hero_position]["Avg"].add(hand.hero_cards, matrix_type, hand.hero_results)
+
     def add_to_hand_matrix_taking_into_account_opponent_pos(self, hand, matrix_type, stat_type, villain_action):
+        if "Avg" not in self.preflop_stats[stat_type].keys():
+            self.preflop_stats[stat_type]["Avg"] = hm.HandMatrix()
+
         if hand.hero_position not in self.preflop_stats[stat_type].keys():
             self.preflop_stats[stat_type][hand.hero_position] = dict()
             self.preflop_stats[stat_type][hand.hero_position]["Avg"] = hm.HandMatrix()
+        # усреднение(без учета позиции)
+        self.preflop_stats[stat_type]["Avg"].add(hand.hero_cards, matrix_type, hand.hero_results)
 
         self.preflop_stats[stat_type][hand.hero_position]["Avg"].add(hand.hero_cards, matrix_type, hand.hero_results)
 

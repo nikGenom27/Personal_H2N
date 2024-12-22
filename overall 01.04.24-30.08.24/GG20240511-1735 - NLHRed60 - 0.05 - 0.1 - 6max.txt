@@ -1,0 +1,69 @@
+Poker Hand #HD1768489229: Hold'em No Limit ($0.05/$0.1) - 2024/05/11 20:36:12
+Table 'NLHRed60' 6-max Seat #1 is the button
+Seat 1: d3e366df ($12.43 in chips)
+Seat 2: Hero ($10 in chips)
+Seat 4: 2c74e1a4 ($11.43 in chips)
+Seat 6: 8969b246 ($10.69 in chips)
+Hero: posts small blind $0.05
+2c74e1a4: posts big blind $0.1
+*** HOLE CARDS ***
+Dealt to d3e366df 
+Dealt to Hero [Ad 9d]
+Dealt to 2c74e1a4 
+Dealt to 8969b246 
+8969b246: folds
+d3e366df: raises $0.2 to $0.3
+Hero: raises $0.9 to $1.2
+2c74e1a4: folds
+d3e366df: folds
+Uncalled bet ($0.9) returned to Hero
+*** SHOWDOWN ***
+Hero collected $0.67 from pot
+*** SUMMARY ***
+Total pot $0.7 | Rake $0.03 | Jackpot $0 | Bingo $0 | Fortune $0 | Tax $0
+Seat 1: d3e366df (button) folded before Flop
+Seat 2: Hero (small blind) collected ($0.67)
+Seat 4: 2c74e1a4 (big blind) folded before Flop
+Seat 6: 8969b246 folded before Flop (didn't bet)
+
+
+Poker Hand #HD1768489160: Hold'em No Limit ($0.05/$0.1) - 2024/05/11 20:35:31
+Table 'NLHRed60' 6-max Seat #6 is the button
+Seat 1: d3e366df ($12.48 in chips)
+Seat 2: Hero ($10 in chips)
+Seat 4: 2c74e1a4 ($11.53 in chips)
+Seat 5: de951332 ($0.5 in chips)
+Seat 6: 8969b246 ($10 in chips)
+d3e366df: posts small blind $0.05
+Hero: posts big blind $0.1
+*** HOLE CARDS ***
+Dealt to d3e366df 
+Dealt to Hero [Qc 7c]
+Dealt to 2c74e1a4 
+Dealt to de951332 
+Dealt to 8969b246 
+2c74e1a4: calls $0.1
+de951332: raises $0.35 to $0.45
+8969b246: raises $0.95 to $1.4
+d3e366df: folds
+Hero: folds
+2c74e1a4: folds
+de951332: calls $0.05 and is all-in
+Uncalled bet ($0.9) returned to 8969b246
+8969b246: shows [Qd Ac]
+de951332: shows [5c Kd]
+*** FLOP *** [As 8h 9s]
+*** TURN *** [As 8h 9s] [3h]
+*** RIVER *** [As 8h 9s 3h] [Qh]
+*** SHOWDOWN ***
+8969b246 collected $1.19 from pot
+*** SUMMARY ***
+Total pot $1.25 | Rake $0.06 | Jackpot $0 | Bingo $0 | Fortune $0 | Tax $0
+Board [As 8h 9s 3h Qh]
+Seat 1: d3e366df (small blind) folded before Flop
+Seat 2: Hero (big blind) folded before Flop
+Seat 4: 2c74e1a4 folded before Flop
+Seat 5: de951332 showed [5c Kd] and lost with Ace-High
+Seat 6: 8969b246 (button) showed [Qd Ac] and won ($1.19) with Pair of Aces and Pair of Queens
+
+

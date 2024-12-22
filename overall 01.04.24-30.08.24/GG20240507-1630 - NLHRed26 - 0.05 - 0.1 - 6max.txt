@@ -1,0 +1,69 @@
+Poker Hand #HD1762838109: Hold'em No Limit ($0.05/$0.1) - 2024/05/07 19:31:17
+Table 'NLHRed26' 6-max Seat #3 is the button
+Seat 3: 77e4b087 ($10.33 in chips)
+Seat 4: Hero ($10 in chips)
+Seat 5: f85ac643 ($10 in chips)
+Seat 6: 4e88dd2e ($10.98 in chips)
+Hero: posts small blind $0.05
+f85ac643: posts big blind $0.1
+*** HOLE CARDS ***
+Dealt to 77e4b087 
+Dealt to Hero [8c Js]
+Dealt to f85ac643 
+Dealt to 4e88dd2e 
+4e88dd2e: raises $0.13 to $0.23
+77e4b087: folds
+Hero: folds
+f85ac643: calls $0.13
+*** FLOP *** [2h Ks 6s]
+f85ac643: checks
+4e88dd2e: bets $0.17
+f85ac643: calls $0.17
+*** TURN *** [2h Ks 6s] [Th]
+f85ac643: checks
+4e88dd2e: checks
+*** RIVER *** [2h Ks 6s Th] [5c]
+f85ac643: checks
+4e88dd2e: checks
+f85ac643: shows [Jd Ah] (Ace-High)
+4e88dd2e: shows [9s As] (Ace-High)
+*** SHOWDOWN ***
+f85ac643 collected $0.81 from pot
+*** SUMMARY ***
+Total pot $0.85 | Rake $0.04 | Jackpot $0 | Bingo $0 | Fortune $0 | Tax $0
+Board [2h Ks 6s Th 5c]
+Seat 3: 77e4b087 (button) folded before Flop (didn't bet)
+Seat 4: Hero (small blind) folded before Flop
+Seat 5: f85ac643 (big blind) showed [Jd Ah] and won ($0.81) with Ace-High
+Seat 6: 4e88dd2e showed [9s As] and lost with Ace-High
+
+
+Poker Hand #HD1762838041: Hold'em No Limit ($0.05/$0.1) - 2024/05/07 19:30:42
+Table 'NLHRed26' 6-max Seat #6 is the button
+Seat 3: 77e4b087 ($10.38 in chips)
+Seat 4: Hero ($10 in chips)
+Seat 5: f85ac643 ($10.15 in chips)
+Seat 6: 4e88dd2e ($10.61 in chips)
+77e4b087: posts small blind $0.05
+Hero: posts big blind $0.1
+*** HOLE CARDS ***
+Dealt to 77e4b087 
+Dealt to Hero [Qh 6h]
+Dealt to f85ac643 
+Dealt to 4e88dd2e 
+f85ac643: raises $0.15 to $0.25
+4e88dd2e: raises $0.5 to $0.75
+77e4b087: folds
+Hero: folds
+f85ac643: folds
+Uncalled bet ($0.5) returned to 4e88dd2e
+*** SHOWDOWN ***
+4e88dd2e collected $0.62 from pot
+*** SUMMARY ***
+Total pot $0.65 | Rake $0.03 | Jackpot $0 | Bingo $0 | Fortune $0 | Tax $0
+Seat 3: 77e4b087 (small blind) folded before Flop
+Seat 4: Hero (big blind) folded before Flop
+Seat 5: f85ac643 folded before Flop
+Seat 6: 4e88dd2e (button) collected ($0.62)
+
+

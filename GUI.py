@@ -1,3 +1,5 @@
+import numpy as np
+
 import Hand as hd
 from HandSorting import HandList
 import Hand_matrix as hdm
@@ -156,24 +158,183 @@ class HandListBoxFrame(ttk.Frame):
         statistics.pre_flop_stats_upd()
         stats_inf = statistics.pre_flop_stats_ret_upd()
         statistics.result_stats()
-        over_all_stats = statistics.result_stats_ret()
+        stats_inf['data_result_stats'] = statistics.result_stats_ret()
 
         statistics_window = Toplevel(self)
+        statistics_window.minsize(width=1200, height=400)
 
-        print(over_all_stats)
-        for stati in stats_inf["preflop_stats"]:
-            print(stati)
-            if type(stats_inf["preflop_stats"][stati]) is float:
-                print(stats_inf["preflop_stats"][stati])
-                print()
-            else:
-                for pos in stats_inf["preflop_stats"][stati].keys():
-                    stat_dct = stats_inf["preflop_stats"][stati][pos]["Avg"].overall_count_return()
-                    print(f"\t{pos}")
-                    for stat_type_ in stat_dct.keys():
-                        print(f"\t\t{stat_type_} {stat_dct[stat_type_]}")
+        preflop_stat_level = PreflopStatisticFrame(statistics_window, stats_inf)
+        preflop_stat_level.pack(fill=BOTH,expand=1)
 
-                print()
+
+class PreflopStatisticFrame(ttk.Frame):
+
+    def __init__(self, root, stats):
+        self.positions = ['SB', 'BB', 'UTG', 'HJ', 'CO', 'BTN']
+        super().__init__(root)
+
+        self.stats_canvas = my_canvas = Canvas(self)
+        self.stats_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+        self.y_scrollbar = ttk.Scrollbar(self, orient=VERTICAL, command=my_canvas.yview)
+        self.y_scrollbar.pack(side=RIGHT, fill=Y)
+        self.stats_canvas.configure(yscrollcommand=self.y_scrollbar.set)
+        root.bind("<MouseWheel>", lambda e: self.stats_canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
+        self.stats_canvas.bind("<Configure>", lambda e: self.stats_canvas.config(scrollregion=self.stats_canvas.bbox(ALL)))
+
+        self.canvas_frame = Frame(my_canvas)
+        self.stats_canvas.create_window((0, 0), window=self.canvas_frame, anchor="nw")
+
+        self.general_info_frame = ttk.Frame(self.canvas_frame)
+        self.general_info_frame.grid(row=0, column=0, sticky=(W))
+        self.data_len_label = ttk.Label(self.general_info_frame, text=f"Количество раздач:",
+                                   font=("Arial", 12))
+        self.data_len_value = ttk.Label(self.general_info_frame, text=f"{np.round(stats['data_result_stats']['data_len'], 1)}",
+                                       font=("Arial", 12))
+        self.data_results_label = ttk.Label(self.general_info_frame, text=f"Результаты в бб:",
+                                       font=("Arial", 12))
+        self.data_results_value = ttk.Label(self.general_info_frame, text=f"{np.round(stats['data_result_stats']['result'], 1)}",
+                                       font=("Arial", 12))
+        self.data_expected_label = ttk.Label(self.general_info_frame, text=f"Ожидание в бб/100:",
+                                        font=("Arial", 12))
+        self.data_expected_value = ttk.Label(self.general_info_frame, text=f"{np.round(stats['data_result_stats']['bb/100'], 1)}",
+                                        font=("Arial", 12))
+        self.data_len_label.grid(row=0, column=0, sticky=(W))
+        self.data_len_value.grid(row=0, column=1, sticky=(W))
+        self.data_results_label.grid(row=1, column=0, sticky=(W))
+        self.data_results_value.grid(row=1, column=1, sticky=(W))
+        self.data_expected_label.grid(row=2, column=0, sticky=(W))
+        self.data_expected_value.grid(row=2, column=1, sticky=(W))
+        keys_lst = list(stats['preflop_stats'].keys())
+        self.all_actions_frame = ttk.Frame(self.canvas_frame)
+        self.all_actions_frame.grid(row=3, column=0, sticky=(W))
+        for i, act_key in list(enumerate(keys_lst))[2:]:
+            if len(stats['preflop_stats'][act_key]):
+                action_frame = ttk.Frame(self.all_actions_frame)
+                action_frame.grid(row=i, column=0, sticky=(W), pady=7)
+                ttk.Label(action_frame, text=f"{act_key}", font=("Arial", 13)).grid(row=0, column=0, sticky=(W))
+                position_keys_lst = list(stats['preflop_stats'][act_key].keys())
+                content_action_frame = ttk.Frame(action_frame)
+                content_action_frame.grid(row=1, column=0, sticky=(W))
+                all_pos_frame = ttk.Frame(content_action_frame)
+                all_pos_frame.grid(row=0, column=1, sticky=(W))
+                info_frame = ttk.Frame(content_action_frame)
+                info_frame.grid(row=0, column=0, sticky=(W, S))
+
+                for j, key in enumerate(hdm.HandMatrix().ret_overall_keys(), start=1):
+                    ttk.Label(info_frame, text=f"{key}", font=("Arial", 10)).grid(row=j, column=0, sticky=(W))
+
+                common_frame = ttk.Frame(all_pos_frame)
+                common_frame.grid(row=1, column=0, padx=8)
+                self.position_action_visual(common_frame, stats['preflop_stats'][act_key]['Avg'], 'Common')
+
+                for j, key in enumerate(self.positions, start=1):
+                    if key in position_keys_lst:
+                        pos_frame = ttk.Frame(all_pos_frame)
+                        pos_frame.grid(row=1, column=j, padx=8)
+                        self.position_action_visual(pos_frame, stats['preflop_stats'][act_key][key]['Avg'], key)
+
+    @staticmethod
+    def position_action_visual(frame, act_pos_stat, pos):
+        stats = act_pos_stat.overall_count_return()
+        pos_label_frame = ttk.Frame(frame)
+        pos_label_frame.grid(row=0, column=0, sticky=(W), padx=2)
+        ttk.Label(pos_label_frame, text=f"{pos}", font=("Arial", 11)).grid(row=0, column=0, sticky=(W), padx=2)
+        hm_win = HandMatrixVisualisation(frame, act_pos_stat)
+        ttk.Button(pos_label_frame, text="mat", command=hm_win.show_hand_matrix_window).grid(row=0, column=1, sticky=(W), padx=2)
+        content_frame = ttk.Frame(frame)
+        content_frame.grid(row=1, column=0)
+        for i, act_type in enumerate(stats[list(stats.keys())[0]].keys()):
+            ttk.Label(content_frame, text=f"{act_type}", font=("Arial", 10)).grid(row=0, column=i, sticky=(W), padx=2)
+        for i, key in enumerate(stats.keys()):
+            for j, act_type in enumerate(stats[key].keys()):
+                ttk.Label(content_frame, text=f"{np.round(stats[key][act_type], 2)}", font=("Arial", 10)).grid(row=i+1, column=j, sticky=(W), padx=2)
+
+
+class HandMatrixVisualisation:
+
+    def __init__(self, root, hand_matrix):
+        self.root = root
+        self.hand_matrix = hand_matrix
+        self.hand_matrix_window_flag = False
+        self.particular_hand_stats = None
+        self.win = None
+        self.hand_matrix_frame = None
+        self.matrix_buttons_dict = dict()
+
+    def show_hand_matrix_window(self):
+        if not self.hand_matrix_window_flag:
+            self.hand_matrix_window_flag = True
+            self.win = Toplevel(self.root)
+            self.win.minsize(height=590, width=1120)
+            self.hand_matrix_frame = ttk.Frame(self.win)
+            self.hand_matrix_frame.grid(column=0, row=0)
+            self.build_matrix_frame()
+            self.win.protocol("WM_DELETE_WINDOW", lambda: self.destroy_hand_matrix_window())
+
+    def destroy_hand_matrix_window(self):
+        self.hand_matrix_window_flag = False
+        self.win.destroy()
+
+    def build_matrix_frame(self):
+        for i, hand in enumerate(self.hand_matrix.hand_matrix.keys()):
+            hand_value = {j: self.hand_matrix.hand_matrix[hand][j]['value'] for j in self.hand_matrix.hand_matrix[hand].keys()}
+            hand_count = {j: self.hand_matrix.hand_matrix[hand][j]['count'] for j in self.hand_matrix.hand_matrix[hand].keys()}
+            hand_frame = ttk.Frame(self.hand_matrix_frame)
+            hand_frame.grid(row=i // 13, column=i % 13, sticky=(W), padx=2)
+            self.build_matrix_hand_button(hand_frame, hand, hand_value, hand_count)
+            color = 'red' if sum(hand_value.values()) < 0 else 'green'
+            color = 'gray' if sum(hand_value.values()) == 0 else color
+            ttk.Label(hand_frame, text=f"{np.round(sum(hand_value.values()), 2)}", font=("Arial", 10), background=color).grid(row=1, column=0, sticky=(W, E), padx=2)
+
+    def build_matrix_hand_button(self, hand_frame, hand, hand_value, hand_count):
+        ttk.Button(hand_frame, text=f"{hand}", width=7,
+                   command=lambda: self.build_particular_hand_frame(hand_value,
+                                                                    hand_count, hand)).grid(row=0, column=0, sticky=(W),
+                                                                                            padx=2)
+
+    def build_particular_hand_frame(self, hand_value, hand_count, hand):
+        if self.particular_hand_stats is None:
+            self.particular_hand_stats = ttk.Frame(self.win)
+            self.particular_hand_stats.grid(column=1, row=0)
+            self.show_particular_hand(hand_value, hand_count, hand)
+        else:
+            self.particular_hand_stats.destroy()
+            self.particular_hand_stats = ttk.Frame(self.win)
+            self.particular_hand_stats.grid(column=1, row=0)
+            self.show_particular_hand(hand_value, hand_count, hand)
+
+    def show_particular_hand(self, hand_value, hand_count, hand):
+        hand_label = ttk.Label(self.particular_hand_stats, font=("Arial", 13), text=hand)
+        hand_label.grid(column=0, row=0)
+        hand_count_ = ttk.Label(self.particular_hand_stats, font=("Arial", 10), text=f"{sum(hand_count.values())}")
+        hand_count_.grid(column=1, row=0)
+        hand_common_value = ttk.Label(self.particular_hand_stats, font=("Arial", 10),
+                                      text=f"{np.round(sum(hand_value.values()), 2)}bb")
+        hand_common_value.grid(column=2, row=0)
+        for i, key in enumerate(hand_value.keys(), start=1):
+            value_frame = ttk.Frame(self.particular_hand_stats)
+            value_frame.grid(column=0, row=i, padx=4)
+            percent_frame = ttk.Frame(self.particular_hand_stats)
+            percent_frame.grid(column=1, row=i, padx=4)
+            exp_value_frame = ttk.Frame(self.particular_hand_stats)
+            exp_value_frame.grid(column=2, row=i, padx=4)
+            hand_action_value_lbl = ttk.Label(value_frame, font=("Arial", 10), text=f"{key}_value")
+            hand_action_value = ttk.Label(value_frame, font=("Arial", 10), text=f"{np.round(hand_value[key], 2)}bb")
+            hand_action_value_lbl.grid(row=0, column=0, sticky=(W))
+            hand_action_value.grid(row=1, column=0, sticky=(W))
+            hand_action_percentage_lbl = ttk.Label(percent_frame, font=("Arial", 10),
+                                                   text=f"{key}_percent")
+            hand_action_percentage = ttk.Label(percent_frame, font=("Arial", 10),
+                                               text=f"{np.round(hand_count[key] / sum(hand_count.values()), 2)}")
+            hand_action_percentage_lbl.grid(row=0, column=0, sticky=(W))
+            hand_action_percentage.grid(row=1, column=0, sticky=(W))
+            hand_action_exp_value_lbl = ttk.Label(exp_value_frame, font=("Arial", 10),
+                                                  text=f"{key}_exp_value(bb/100)")
+            exp_value = np.round(hand_value[key] / hand_count[key] * 100, 2) if hand_count[key] != 0 else 0
+            hand_action_exp_value = ttk.Label(exp_value_frame, font=("Arial", 10),
+                                              text=f"{exp_value}")
+            hand_action_exp_value_lbl.grid(row=0, column=0, sticky=(W))
+            hand_action_exp_value.grid(row=1, column=0, sticky=(W))
 
 
 class HandSortingFrame(ttk.Frame):

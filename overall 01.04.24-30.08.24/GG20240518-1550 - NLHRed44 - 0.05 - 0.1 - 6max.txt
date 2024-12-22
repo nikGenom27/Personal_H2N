@@ -1,0 +1,85 @@
+Poker Hand #HD1778105500: Hold'em No Limit ($0.05/$0.1) - 2024/05/18 18:51:39
+Table 'NLHRed44' 6-max Seat #6 is the button
+Seat 1: Hero ($10 in chips)
+Seat 3: dba2ac92 ($8.05 in chips)
+Seat 4: 5046760d ($27.4 in chips)
+Seat 6: 47beafe8 ($24.1 in chips)
+Hero: posts small blind $0.05
+dba2ac92: posts big blind $0.1
+*** HOLE CARDS ***
+Dealt to Hero [Qh 7s]
+Dealt to dba2ac92 
+Dealt to 5046760d 
+Dealt to 47beafe8 
+5046760d: folds
+47beafe8: raises $0.11 to $0.21
+Hero: folds
+dba2ac92: calls $0.11
+*** FLOP *** [Td 6h 4s]
+dba2ac92: checks
+47beafe8: checks
+*** TURN *** [Td 6h 4s] [9c]
+dba2ac92: checks
+47beafe8: checks
+*** RIVER *** [Td 6h 4s 9c] [Jh]
+dba2ac92: checks
+47beafe8: bets $0.36
+dba2ac92: folds
+Uncalled bet ($0.36) returned to 47beafe8
+*** SHOWDOWN ***
+47beafe8 collected $0.45 from pot
+*** SUMMARY ***
+Total pot $0.47 | Rake $0.02 | Jackpot $0 | Bingo $0 | Fortune $0 | Tax $0
+Board [Td 6h 4s 9c Jh]
+Seat 1: Hero (small blind) folded before Flop
+Seat 3: dba2ac92 (big blind) folded on the River
+Seat 4: 5046760d folded before Flop (didn't bet)
+Seat 6: 47beafe8 (button) won ($0.45)
+
+
+Poker Hand #HD1778105393: Hold'em No Limit ($0.05/$0.1) - 2024/05/18 18:50:42
+Table 'NLHRed44' 6-max Seat #4 is the button
+Seat 1: Hero ($10 in chips)
+Seat 2: 36c6f009 ($6.06 in chips)
+Seat 3: dba2ac92 ($8.05 in chips)
+Seat 4: 5046760d ($21.89 in chips)
+Seat 6: 47beafe8 ($24.15 in chips)
+47beafe8: posts small blind $0.05
+Hero: posts big blind $0.1
+*** HOLE CARDS ***
+Dealt to Hero [3c Qs]
+Dealt to 36c6f009 
+Dealt to dba2ac92 
+Dealt to 5046760d 
+Dealt to 47beafe8 
+36c6f009: raises $0.2 to $0.3
+dba2ac92: folds
+5046760d: raises $0.57 to $0.87
+47beafe8: folds
+Hero: folds
+36c6f009: raises $5.19 to $6.06 and is all-in
+5046760d: calls $5.19
+36c6f009: shows [5h 5d]
+5046760d: shows [Ad Ah]
+*** FIRST FLOP *** [4d 9s 3s]
+*** FIRST TURN *** [4d 9s 3s] [Kd]
+*** FIRST RIVER *** [4d 9s 3s Kd] [3h]
+*** SECOND FLOP *** [7s 6d Js]
+*** SECOND TURN *** [7s 6d Js] [Qd]
+*** SECOND RIVER *** [7s 6d Js Qd] [4c]
+*** FIRST SHOWDOWN ***
+5046760d collected $5.79 from pot
+*** SECOND SHOWDOWN ***
+5046760d collected $5.78 from pot
+*** SUMMARY ***
+Total pot $12.27 | Rake $0.6 | Jackpot $0.1 | Bingo $0 | Fortune $0 | Tax $0
+Hand was run two times
+FIRST Board [4d 9s 3s Kd 3h]
+SECOND Board [7s 6d Js Qd 4c]
+Seat 1: Hero (big blind) folded before Flop
+Seat 2: 36c6f009 showed [5h 5d] and lost with Pair of Fives and Pair of Treys, and lost with Pair of Fives
+Seat 3: dba2ac92 folded before Flop (didn't bet)
+Seat 4: 5046760d (button) showed [Ad Ah] and won ($5.79) with Pair of Aces and Pair of Treys, and won ($5.78) with Pair of Aces
+Seat 6: 47beafe8 (small blind) folded before Flop
+
+

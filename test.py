@@ -1,110 +1,80 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-import Statistics_upd as stat
-import os
-import Hand as hnd
-from HandSorting import HandList
-
-# path = 'NLH 0.02-0.05 01.04.24-30.04.24'
-# path = 'NLH 0.05-0.10 01.05.24-31.05.24'
-
-
-inf_lst = HandList()
-hand_inf_lst = list()
-value = list()
-
-folders = [
-    'NLH 0.02-0.05 01.04.24-30.04.24',]
-"""    'NLH 0.05-0.10 01.05.24-31.05.24',
-    'NLH 0.05-0.10 01.06.24-30.06.24',
-    'NLH 0.05-0.10 01.07.24-31.07.24',
-    'R&C 0.05-0.10 01.07.24-31.07.24',
-    'R&C 0.05-0.10 01.08.24-30.08.24',"""
-for l in folders:
-    lst_dr = os.listdir(l)
-    for f in lst_dr:
-        with open(f"{l}/{f}", 'r') as hand_info:
-            inf = hand_info.read().split("\n\n\n")
-
-        for hand in inf:
-            if hnd.data_can_be_processed(hand):
-                try:
-                    hand_inf = hnd.Hand(hand)
-                    hand_inf_lst.append(hand)
-                    inf_lst.append(hand_inf)
-                    try:
-                        value.append(hand_inf.hero_results + value[-1])
-                    except IndexError:
-                        value.append(hand_inf.hero_results)
-                except:
-                    raise IndexError
-
-sorteddd = inf_lst.ret_pot_size_filtered(90, 100).ret_hero_in_post_flop_filtered().ret_sorted_by_results()
-for i in sorteddd:
-    print(i, end=" ")
 """
-stats_upd = stat.Stats(inf_lst)
-stats_upd.pre_flop_stats_upd()
-stats_inf = stats_upd.pre_flop_stats_ret_upd()
-for stat in stats_inf["preflop_stats"]:
-    print(stat)
-    if type(stats_inf["preflop_stats"][stat]) is float:
-        print(stats_inf["preflop_stats"][stat])
-        print()
-    else:
-        for pos in stats_inf["preflop_stats"][stat].keys():
-            if type(stats_inf["preflop_stats"][stat][pos]) is not dict:
-                count, percentages, value = stats_inf["preflop_stats"][stat][pos].overall_count_return()
-                print(pos, percentages, count, value)
-            else:
-                for HeroPos_vs_OppPos in stats_inf["preflop_stats"][stat][pos].keys():
-                    count, percentages, value = stats_inf["preflop_stats"][stat][pos][HeroPos_vs_OppPos].overall_count_return()
-                    print(HeroPos_vs_OppPos, percentages, count, value)
-        print()
-    '''
-    for j in ["UTG", "HJ", "CO", "BTN", "SB", "BB"]:
-        for k in stats_inf'''
+from tkinter import *
 
-stats_upd.result_stats()
-result = stats_upd.result_stats_ret()
-for hand in result:
-    print(hand, result[hand])"""
+from tkinter import ttk
+
+
+root = Tk()
+
+root.title('Full Window Scrolling X Y Scrollbar Example')
+
+root.geometry("1350x400")
+
+# Create A Main frame
+
+main_frame = Frame(root)
+
+main_frame.pack(fill=BOTH,expand=1)
+
+# Create Frame for X Scrollbar
+
+sec = Frame(main_frame)
+
+sec.pack(fill=X,side=BOTTOM)
+
+# Create A Canvas
+
+my_canvas = Canvas(main_frame)
+
+my_canvas.pack(side=LEFT,fill=BOTH,expand=1)
+
+# Add A Scrollbars to Canvas
+
+x_scrollbar = ttk.Scrollbar(sec,orient=HORIZONTAL,command=my_canvas.xview)
+
+x_scrollbar.pack(side=BOTTOM,fill=X)
+
+y_scrollbar = ttk.Scrollbar(main_frame,orient=VERTICAL,command=my_canvas.yview)
+y_scrollbar.pack(side=RIGHT,fill=Y)
+
+# Configure the canvas
+
+my_canvas.configure(xscrollcommand=x_scrollbar.set)
+
+my_canvas.configure(yscrollcommand=y_scrollbar.set)
+
+my_canvas.bind("<Configure>",lambda e: my_canvas.config(scrollregion= my_canvas.bbox(ALL)))
+# Create Another Frame INSIDE the Canvas
+
+second_frame = Frame(my_canvas)
+# Add that New Frame a Window In The Canvas
+
+my_canvas.create_window((0,0),window= second_frame, anchor="nw")
+
+for thing in range(100):
+
+    Button(second_frame ,text=f"Button  {thing}").grid(row=5,column=thing,pady=10,padx=10)
+
+for thing in range(100):
+
+    Button(second_frame ,text=f"Button  {thing}").grid(row=thing,column=5,pady=10,padx=10)
+
+
+
+root.mainloop()
 """
-hand_dct = stats.ret_hand_matrix_value()
-alph_lst = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
-for hand in alph_lst:
-
-    value_lst = list()
-    for j in alph_lst:
-        if hand+j in hand_dct[0].keys():
-            print(hand+j, end="\t\t")
-            value_lst.append(np.round(hand_dct[0][hand+j][2]/hand_dct[0][hand+j][1], 1))
-        elif hand+j+"s" in hand_dct[0].keys():
-            print(hand+j+"s", end="\t\t")
-            value_lst.append(np.round(hand_dct[0][hand+j+"s"][2]/hand_dct[0][hand+j+"s"][1], 1))
-        else:
-            print(j+hand+"o", end="\t\t")
-            value_lst.append(np.round(hand_dct[0][j+hand+"o"][2]/hand_dct[0][j+hand+"o"][1], 1))
-    print()
-    print(" \t".join(list(map(str, value_lst))))
-    print()
-
-for hand in alph_lst:
-
-    value_lst = list()
-    for j in alph_lst:
-        if hand + j in hand_dct[1].keys():
-            print(hand + j, end="\t\t")
-            value_lst.append(np.round(hand_dct[1][hand + j][2] / hand_dct[1][hand + j][1], 1))
-        elif hand + j + "s" in hand_dct[1].keys():
-            print(hand + j + "s", end="\t\t")
-            value_lst.append(np.round(hand_dct[1][hand + j + "s"][2] / hand_dct[1][hand + j + "s"][1], 1))
-        else:
-            print(j + hand + "o", end="\t\t")
-            value_lst.append(np.round(hand_dct[1][j + hand + "o"][2] / hand_dct[1][j + hand + "o"][1], 1))
-    print()
-    print(" \t".join(list(map(str, value_lst))))
-    print()"""
-
-# stats.show_result_plot()
+from tkinter import *
+root=Tk()
+frame=Frame(root,width=300,height=300)
+frame.pack(expand=True, fill=BOTH) #.grid(row=0,column=0)
+canvas=Canvas(frame,bg='#FFFFFF',width=300,height=300,scrollregion=(0,0,500,500))
+hbar=Scrollbar(frame,orient=HORIZONTAL)
+hbar.pack(side=BOTTOM,fill=X)
+hbar.config(command=canvas.xview)
+vbar=Scrollbar(frame,orient=VERTICAL)
+vbar.pack(side=RIGHT,fill=Y)
+vbar.config(command=canvas.yview)
+canvas.config(width=300,height=300)
+canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+canvas.pack(side=LEFT,expand=True,fill=BOTH)
+root.mainloop()

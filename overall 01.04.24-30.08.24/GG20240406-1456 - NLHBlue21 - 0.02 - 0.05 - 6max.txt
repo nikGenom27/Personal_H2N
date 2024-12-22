@@ -1,0 +1,46 @@
+Poker Hand #HD1718510300: Hold'em No Limit ($0.02/$0.05) - 2024/04/06 17:56:12
+Table 'NLHBlue21' 6-max Seat #3 is the button
+Seat 1: 548edfa9 ($10.32 in chips)
+Seat 2: 7aec9aef ($5 in chips)
+Seat 3: 986b316d ($16.63 in chips)
+Seat 4: 9fbebcfe ($11.34 in chips)
+Seat 5: Hero ($5 in chips)
+Seat 6: 8c442957 ($5 in chips)
+9fbebcfe: posts small blind $0.02
+Hero: posts big blind $0.05
+*** HOLE CARDS ***
+Dealt to 548edfa9 
+Dealt to 7aec9aef 
+Dealt to 986b316d 
+Dealt to 9fbebcfe 
+Dealt to Hero [Kc Ts]
+Dealt to 8c442957 
+8c442957: folds
+548edfa9: folds
+7aec9aef: folds
+986b316d: raises $0.08 to $0.13
+9fbebcfe: calls $0.11
+Hero: folds
+*** FLOP *** [5d Jh 2c]
+9fbebcfe: checks
+986b316d: checks
+*** TURN *** [5d Jh 2c] [3s]
+9fbebcfe: bets $0.16
+986b316d: calls $0.16
+*** RIVER *** [5d Jh 2c 3s] [7d]
+9fbebcfe: bets $0.32
+986b316d: folds
+Uncalled bet ($0.32) returned to 9fbebcfe
+*** SHOWDOWN ***
+9fbebcfe collected $0.6 from pot
+*** SUMMARY ***
+Total pot $0.63 | Rake $0.03 | Jackpot $0 | Bingo $0 | Fortune $0 | Tax $0
+Board [5d Jh 2c 3s 7d]
+Seat 1: 548edfa9 folded before Flop (didn't bet)
+Seat 2: 7aec9aef folded before Flop (didn't bet)
+Seat 3: 986b316d (button) folded on the River
+Seat 4: 9fbebcfe (small blind) won ($0.6)
+Seat 5: Hero (big blind) folded before Flop
+Seat 6: 8c442957 folded before Flop (didn't bet)
+
+

@@ -14,11 +14,17 @@ class HandMatrix:
         for card1 in self.alph_lst:
             for card2 in self.alph_lst:
                 if card1 == card2:
-                    self.hand_matrix[card1 + card2] = dict()
+                    self.hand_matrix[card1 + card2] = {'raises': {"count": 0, "value": 0},
+                                                       'calls': {"count": 0, "value": 0},
+                                                       'folds': {"count": 0, "value": 0}}
                 elif card2 + card1 + "s" in self.hand_matrix.keys():
-                    self.hand_matrix[card2 + card1 + "o"] = dict()
+                    self.hand_matrix[card2 + card1 + "o"] = {'raises': {"count": 0, "value": 0},
+                                                             'calls': {"count": 0, "value": 0},
+                                                             'folds': {"count": 0, "value": 0}}
                 else:
-                    self.hand_matrix[card1 + card2 + "s"] = dict()
+                    self.hand_matrix[card1 + card2 + "s"] = {'raises': {"count": 0, "value": 0},
+                                                             'calls': {"count": 0, "value": 0},
+                                                             'folds': {"count": 0, "value": 0}}
 
     def hand_transform(self, cards):
         self.cur_cards = str()
@@ -34,20 +40,14 @@ class HandMatrix:
 
         self.hand_transform(cards)
 
-        if matrix_type not in self.hand_matrix[self.cur_cards].keys():
-            self.hand_matrix[self.cur_cards][matrix_type] = {
-                "count": 1,
-                "value": value
-            }
-        else:
-            self.hand_matrix[self.cur_cards][matrix_type]["count"] += 1
-            self.hand_matrix[self.cur_cards][matrix_type]["value"] += value
+        self.hand_matrix[self.cur_cards][matrix_type]["count"] += 1
+        self.hand_matrix[self.cur_cards][matrix_type]["value"] += value
 
     def overall_count_return(self):
         count_ = dict()
         percentages_ = dict()
         value_ = dict()
-        value_per_hund = dict()
+        value_per_hand = dict()
         for cards in self.hand_matrix.keys():
             for type_ in self.hand_matrix[cards].keys():
                 if type_ not in count_.keys():
@@ -57,11 +57,18 @@ class HandMatrix:
                 count_[type_] += self.hand_matrix[cards][type_]["count"]
                 value_[type_] += self.hand_matrix[cards][type_]["value"]
         for type_ in percentages_.keys():
-            percentages_[type_] = count_[type_] / sum(count_.values())
-            value_per_hund[type_] = np.round(value_[type_] / count_[type_] * 100, 1)
+            percentages_[type_] = count_[type_] / sum(count_.values()) * 100
+            value_per_hand[type_] = 0
+            if count_[type_] != 0:
+                value_per_hand[type_] = np.round(value_[type_] / count_[type_] * 100, 1)
 
         return {"hand_count": count_, "percentages": percentages_,
-                "total_value": value_, "value_per_100_hand": value_per_hund}
+                "total_value": value_, "value_per_100_hand": value_per_hand}
 
     def hand_matrix_return(self):
         return self.hand_matrix
+
+    @staticmethod
+    def ret_overall_keys():
+        return ["hand_count", "percentages",
+                "total_value", "value_per_100_hand"]
