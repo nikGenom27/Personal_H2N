@@ -31,9 +31,3 @@ class HandList(list):
         for act in action:
             filtered_lst = filtered_lst + HandList(filter(lambda x: act in ' '.join(x.preflop_tags['Hero_action_tags']), self))
         return filtered_lst
-
-"""
-по позициям оппонентов, Добавить фильтрацию по рукам, 
-по количеству оппов в раздаче(пока разделение на два класса heads up и мультипот),
-по действиям оппов
-"""
